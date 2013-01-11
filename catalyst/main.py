@@ -17,6 +17,8 @@ sys.path.append(__selfpath__ + "/modules")
 
 import catalyst.config
 import catalyst.util
+from catalyst.modules.catalyst_support import (required_build_targets,
+	valid_build_targets, CatalystError, hash_map, find_binary, LockInUse)
 
 __maintainer__="Catalyst <catalyst@gentoo.org>"
 __version__="2.0.12.2"
@@ -118,6 +120,9 @@ def parse_config(myconfig):
 			print "Setting",x,"to default value \""+confdefaults[x]+"\""
 			conf_values[x]=confdefaults[x]
 
+	# add our python base directory to use for loading target arch's
+	conf_values["PythonDir"] = __selfpath__
+
 	# parse out the rest of the options from the config file
 	if "autoresume" in string.split(conf_values["options"]):
 		print "Autoresuming support enabled."
@@ -196,32 +201,32 @@ def import_modules():
 	targetmap={}
 
 	try:
+		module_dir = __selfpath__ + "/modules/"
 		for x in required_build_targets:
 			try:
-				fh=open(conf_values["sharedir"]+"/modules/"+x+".py")
-				module=imp.load_module(x,fh,"modules/"+x+".py",
-					(".py","r",imp.PY_SOURCE))
+				fh=open(module_dir + x + ".py")
+				module=imp.load_module(x, fh,"modules/" + x + ".py",
+					(".py", "r", imp.PY_SOURCE))
 				fh.close()
 
 			except IOError:
-				raise CatalystError,"Can't find "+x+".py plugin in "+\
-					conf_values["sharedir"]+"/modules/"
-
+				raise CatalystError, "Can't find " + x + ".py plugin in " + \
+					module_dir
 		for x in valid_build_targets:
 			try:
-				fh=open(conf_values["sharedir"]+"/modules/"+x+".py")
-				module=imp.load_module(x,fh,"modules/"+x+".py",
-					(".py","r",imp.PY_SOURCE))
+				fh=open(module_dir + x + ".py")
+				module=imp.load_module(x, fh, "modules/" + x + ".py",
+					(".py", "r", imp.PY_SOURCE))
 				module.register(targetmap)
 				fh.close()
 
 			except IOError:
-				raise CatalystError,"Can't find "+x+".py plugin in "+\
-					conf_values["sharedir"]+"/modules/"
+				raise CatalystError,"Can't find " + x + ".py plugin in " + \
+					module_dir
 
 	except ImportError:
 		print "!!! catalyst: Python modules not found in "+\
-			conf_values["sharedir"]+"/modules; exiting."
+			module_dir + "; exiting."
 		sys.exit(1)
 
 	return targetmap
@@ -242,7 +247,7 @@ def build_target(addlargs, targetmap):
 			addlargs["target"]
 		sys.exit(1)
 
-if __name__ == "__main__":
+def main():
 	targetmap={}
 
 	version()
@@ -347,8 +352,6 @@ if __name__ == "__main__":
 
 	# import configuration file and import our main module using those settings
 	parse_config(myconfig)
-	sys.path.append(conf_values["sharedir"]+"/modules")
-	from catalyst_support import *
 
 	# Start checking that digests are valid now that the hash_map was imported
 	# from catalyst_support
