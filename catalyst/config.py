@@ -1,5 +1,5 @@
 import re
-from catalyst_support import *
+from catalyst.support import *
 
 class ParserBase:
 
