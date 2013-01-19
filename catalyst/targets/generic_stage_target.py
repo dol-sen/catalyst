@@ -4,6 +4,7 @@ from generic_target import *
 from stat import *
 from catalyst.lock import LockDir
 
+
 class generic_stage_target(generic_target):
 	"""
 	This class does all of the chroot setup, copying of files, etc. It is
@@ -1629,6 +1630,7 @@ class generic_stage_target(generic_target):
 		if os.path.exists(file+".CONTENTS"):
 			os.remove(file+".CONTENTS")
 		if "contents" in self.settings:
+			contents_map = self.settings["contents_map"]
 			if os.path.exists(file):
 				myf=open(file+".CONTENTS","w")
 				keys={}
@@ -1637,7 +1639,7 @@ class generic_stage_target(generic_target):
 					array=keys.keys()
 					array.sort()
 				for j in array:
-					contents=generate_contents(file,contents_function=j,\
+					contents = contents_map.generate_contents(file, j,
 						verbose="VERBOSE" in self.settings)
 					if contents:
 						myf.write(contents)
@@ -1647,6 +1649,7 @@ class generic_stage_target(generic_target):
 		if os.path.exists(file+".DIGESTS"):
 			os.remove(file+".DIGESTS")
 		if "digests" in self.settings:
+			hash_map = self.settings["hash_map"]
 			if os.path.exists(file):
 				myf=open(file+".DIGESTS","w")
 				keys={}
@@ -1657,14 +1660,14 @@ class generic_stage_target(generic_target):
 				for f in [file, file+'.CONTENTS']:
 					if os.path.exists(f):
 						if "all" in array:
-							for k in hash_map.keys():
-								hash=generate_hash(f,hash_function=k,verbose=\
-									"VERBOSE" in self.settings)
+							for k in list(hash_map.hash_map):
+								hash = hash_map.generate_hash(f,hash_=k,
+									verbose = "VERBOSE" in self.settings)
 								myf.write(hash)
 						else:
 							for j in array:
-								hash=generate_hash(f,hash_function=j,verbose=\
-									"VERBOSE" in self.settings)
+								hash = hash_map.generate_hash(f,hash_=j,
+									verbose = "VERBOSE" in self.settings)
 								myf.write(hash)
 				myf.close()
 
