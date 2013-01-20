@@ -7,8 +7,10 @@
 # Chris Gianelloni <wolf31o2@wolf31o2.org>
 # $Id$
 
-import os, sys, imp, string, getopt
-import pdb
+import os
+import sys
+import imp
+import getopt
 import os.path
 
 __selfpath__ = os.path.abspath(os.path.dirname(__file__))
@@ -154,8 +156,8 @@ def import_modules():
 				fh.close()
 
 			except IOError:
-				raise CatalystError, "Can't find " + x + ".py plugin in " + \
-					module_dir
+				raise CatalystError("Can't find " + x + ".py plugin in " +
+					module_dir, print_traceback=True)
 		for x in valid_build_targets:
 			try:
 				fh=open(module_dir + x + ".py")
@@ -165,8 +167,8 @@ def import_modules():
 				fh.close()
 
 			except IOError:
-				raise CatalystError,"Can't find " + x + ".py plugin in " + \
-					module_dir
+				raise CatalystError("Can't find " + x + ".py plugin in " +
+					module_dir, print_traceback=True)
 
 	except ImportError as e:
 		print "!!! catalyst: Python modules not found in "+\
@@ -179,15 +181,18 @@ def import_modules():
 def build_target(addlargs, targetmap):
 	try:
 		if addlargs["target"] not in targetmap:
-			raise CatalystError, \
-				"Target \"%s\" not available." % addlargs["target"]
+			raise CatalystError(
+				"Target \"%s\" not available." % addlargs["target"],
+				print_traceback=True)
 
 		mytarget=targetmap[addlargs["target"]](conf_values, addlargs)
 
 		mytarget.run()
 
 	except:
+		print "Python traceback output follows:"
 		catalyst.util.print_traceback()
+		print
 		print "!!! catalyst: Error encountered during run of target " + \
 			addlargs["target"]
 		sys.exit(1)
@@ -219,14 +224,9 @@ def main():
 		usage()
 		sys.exit(2)
 
-	# defaults for commandline opts
-	debug=False
-	verbose=False
-	fetch=False
 	myconfig=""
 	myspecfile=""
 	mycmdline=[]
-	myopts=[]
 
 	# check preconditions
 	if len(opts) == 0:
@@ -367,7 +367,7 @@ def main():
 			sys.exit(1)
 
 	if "target" not in addlargs:
-		raise CatalystError, "Required value \"target\" not specified."
+		raise CatalystError("Required value \"target\" not specified.")
 
 	# everything is setup, so the build is a go
 	try:
