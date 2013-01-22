@@ -57,6 +57,8 @@ contents_definitions = {
 }
 
 
+# please try to avoid using "-", "/", "." in key names
+# due to them not being compatible in the bash environment
 confdefaults={
 <<<<<<< HEAD
 =======
@@ -64,7 +66,7 @@ confdefaults={
 	"distdir": "/usr/portage/distfiles",
 	"hash_function": "crc32",
 	"local_overlay": "/usr/local/portage",
-	"make.conf": "/etc/portage/make.conf",
+	"make_conf": "/etc/portage/make.conf",
 	"options": set(),
 	"packagedir": "/usr/portage/packages",
 	"portdir": "/usr/portage",
@@ -76,6 +78,7 @@ confdefaults={
 	"snapshot_name": "portage-",
 	"storedir": "/var/tmp/catalyst",
 	}
+
 
 target_mounts = {
 	"proc": "/proc",
