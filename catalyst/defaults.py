@@ -60,9 +60,6 @@ contents_definitions = {
 # please try to avoid using "-", "/", "." in key names
 # due to them not being compatible in the bash environment
 confdefaults={
-<<<<<<< HEAD
-=======
->>>>>>> 10e951d... Break out more repeated (path1 + path2)'s...
 	"distdir": "/usr/portage/distfiles",
 	"hash_function": "crc32",
 	"local_overlay": "/usr/local/portage",
