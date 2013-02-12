@@ -60,6 +60,7 @@ contents_definitions = {
 # please try to avoid using "-", "/", "." in key names
 # due to them not being compatible in the bash environment
 confdefaults={
+	"archdir": "%(PythonDir)s/arch",
 	"distdir": "/usr/portage/distfiles",
 	"hash_function": "crc32",
 	"local_overlay": "/usr/local/portage",
@@ -68,6 +69,7 @@ confdefaults={
 	"packagedir": "/usr/portage/packages",
 	"portdir": "/usr/portage",
 	"port_tmpdir": "/var/tmp/portage",
+	"PythonDir": "./catalyst",
 	"repo_name": "portage",
 	"sharedir": "/usr/lib/catalyst",
 	"shdir": "/usr/lib/catalyst/targets/",
