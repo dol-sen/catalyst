@@ -5,3 +5,4 @@ Scratch*
 dist*
 *.patch
 MANIFEST
+*.geany
