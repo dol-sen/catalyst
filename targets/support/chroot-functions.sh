@@ -133,9 +133,10 @@ setup_myemergeopts(){
 	then
 		export bootstrap_opts="${bootstrap_opts} -f"
 		export clst_myemergeopts="${clst_myemergeopts} -f"
-	elif [ -n "${clst_PKGCACHE}" ]
+	elif [ -n "${clst_PKGCACHE}" ] && [ -z "${clst_update_seed}" -o "${clst_update_seed}" = "no" ]
 	then
-		export clst_myemergeopts="${clst_myemergeopts} --usepkg --buildpkg --newuse"
+		# if you add --usepkg, then also add --binpkg-respect-use=y
+		export clst_myemergeopts="${clst_myemergeopts} --usepkg --binpkg-respect-use=y --buildpkg --newuse"
 		export bootstrap_opts="${bootstrap_opts} -r"
 	fi
 }
