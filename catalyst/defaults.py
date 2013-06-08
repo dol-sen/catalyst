@@ -1,3 +1,8 @@
+#!/usr/bin/python
+
+# Maintained in full by:
+# Catalyst Team <catalyst@gentoo.org>
+# Release Engineering Team <releng@gentoo.org>
 
 
 required_config_file_values = ["storedir", "sharedir", "distdir", "portdir"]
@@ -41,6 +46,32 @@ hash_definitions = {
 	"tiger160" :["calc_hash2", "shash", ["-a", "TIGER160"], "TIGER160"],
 	"whirlpool":["calc_hash2", "shash", ["-a", "WHIRLPOOL"], "WHIRLPOOL"],
 	}
+
+
+# fields = ["func", "cmd", "args", "id"]
+compress_definitions = {
+	"Type": ["Compression", "Compression definitions loaded"],
+	"rsync"		:["rsync", "rsync", ["-a", "--delete", "%(source)s",  "%(destination)s"], "RSYNC"],
+	"lbz2"		:["_common", "tar", ["-I", "lbzip2", "-cf", "%(filename)s", "-C", "%(destination)s", "%(source)s"], "LBZIP2"],
+	"bz2"		:["_common", "tar", ["-cpjf", "%(filename)s", "-C", "%(destination)s", "%(source)s"], "BZIP2"],
+	"tar"		:["_common", "tar", ["-cpf", "%(filename)s", "-C", "%(destination)s", "%(source)s"], "TAR"],
+	"xz"		:["_common", "tar", ["-cpJf", "%(filename)s", "-C", "%(destination)s", "%(source)s"], "XZ"],
+	"pixz"		:["_common", "tar", ["-I", "pixz", "-cpf", "%(filename)s", "-C", "%(destination)s", "%(source)s"], "PIXZ"],
+	"zip"		:["_common", "tar", ["-cpzf", "%(filename)s", "-C", "%(destination)s", "%(source)s"], "GZIP"],
+	}
+
+
+# fields = ["func", "cmd", "args", "id"]
+decompress_definitions = {
+	"Type": ["Decompression", "Decompression definitions loaded"],
+	"rsync"		:["rsync", "rsync", ["-a", "--delete", "%(source)s", "%(destination)s"], "RSYNC"],
+	"bz2"		:["_common", "tar", ["-I", "lbzip2", "-xpf", "%(source)s", "-C", "%(destination)s"], "LBZIP2"],
+	"tar"		:["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "TAR"],
+	"xz"		:["_common", "tar", ["-I", "pixz", "-xpf", "%(source)s", "-C", "%(destination)s"], "PIXZ"],
+	"zip"		:["_common", "tar", ["-xpzf", "%(source)s", "-C", "%(destination)s"], "GZIP"],
+	"gz"		:["_common", "tar", ["-xpzf", "%(source)s", "-C", "%(destination)s"], "GZIP"],
+	}
+
 
 # use contents.ContentsMap.fields for the value legend
 # Key:[function, cmd]
