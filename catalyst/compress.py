@@ -94,11 +94,12 @@ class CompressMap(object):
 		if self.loaded_type[0] not in ["Compression"]:
 			return False
 		if not infodict:
-			infodict = self.create_infodict(source, target_dir, filename, mode)
+			infodict = self.create_infodict(source, None,
+				basedir, filename, mode or self.mode, auto_extension)
 		if not infodict['mode']:
 			print self.mode_error
 			return False
-		if auto_extension:
+		if infodict['auto-ext'] or auto_extension:
 			infodict['filename'] += self.extension_separator + infodict['mode']
 		return self._run(infodict, fatal=fatal)
 
@@ -201,7 +202,8 @@ class CompressMap(object):
 
 
 	@staticmethod
-	def create_infodict(source, destination, filename='', mode=None):
+	def create_infodict(source, destination, filename='', mode=None,
+			auto_extension=True):
 		'''Puts the source and destination paths into a dictionary
 		for use in string substitution in the defintions
 		%(source) and %(destination) fields embedded into the commands
@@ -215,7 +217,8 @@ class CompressMap(object):
 			'source': source,
 			'destination': destination,
 			'filename': filename,
-			'mode': mode
+			'mode': mode,
+			'auto-ext': auto_extension,
 			}
 
 

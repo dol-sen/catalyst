@@ -20,8 +20,8 @@ from catalyst.lock import LockInUse
 from catalyst.support import CatalystError, find_binary
 from catalyst.defaults import hash_definitions, confdefaults, option_messages
 from hash_utils import HashMap
-from defaults import  (contents_definitions, compress_definitions,
-	decompress_definitions)
+from defaults import contents_definitions
+from compress import compress_definitions, decompress_definitions
 from contents import ContentsMap
 from catalyst.version import get_version
 
