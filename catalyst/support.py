@@ -120,25 +120,42 @@ def find_binary(myc):
 	return None
 
 
-def cmd(mycmd, myexc="", env={}, debug=False):
-	try:
-		sys.stdout.flush()
-		args=[BASH_BINARY]
-		if "BASH_ENV" not in env:
-			env["BASH_ENV"] = "/etc/spork/is/not/valid/profile.env"
-		if debug:
-			args.append("-x")
-		args.append("-c")
+def cmd(mycmd, myexc="", env=None, debug=False, fatal=True):
+	if not env:
+		print "cmd(), ERROR, env parameter is not defined:", env
+	if "BASH_ENV" not in list(env):
+		env["BASH_ENV"] = "/etc/spork/is/not/valid/profile.env"
+	sys.stdout.flush()
+	args=[BASH_BINARY]
+	if debug:
+		args.append("-x")
+	args.append("-c")
+
+	# mycmd needs to be added as a string, not a list
+	if isinstance(mycmd, list):
+		args.append(' '.join(mycmd))
+	else:
 		args.append(mycmd)
 
-		#if debug:
-		print "***** cmd(); args =", args
+	#if debug:
+	print "***** cmd(); args =", args
+
+	msg = None
+	try:
 		proc = Popen(args, env=env)
 		if proc.wait() != 0:
-			raise CatalystError("cmd() NON-zero return value from: %s" % myexc,
-				print_traceback=False)
-	except:
-		raise
+			msg = "cmd() NON-zero return value from: %s" % myexc
+	except Exception as e:
+		if fatal:
+			raise e
+		print "cmd() ERROR: %s" % str(e)
+		return False
+	if msg: # non-zero return code
+		if fatal:
+				raise CatalystError(msg, print_traceback=False)
+		print '!!!', msg
+		return False
+	return True
 
 
 def file_locate(settings,filelist,expand=1):
