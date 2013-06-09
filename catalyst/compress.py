@@ -41,6 +41,7 @@ decompress_definitions = {
 	"gz"		:["_common", "tar", ["-xpzf", "%(source)s", "-C", "%(destination)s"], "GZIP"],
 	}
 
+
 extension_separator = '.'
 
 
@@ -79,14 +80,15 @@ class CompressMap(object):
 		del obj
 
 
-	def compress(self, infodict, filename, source, target_dir,
-			mode=None, fatal=True):
+	def compress(self, infodict=None, filename='', source=None,
+			target_dir=None, mode=None, auto_extension=False, fatal=True):
 		'''Compression function
 
-		@param source: string, path to a directory or file
-		@param target_dir: string, path a directoy or file
-		@param mode; string, desired method to perform the
-			compression or transfer
+		@param infodict: optional dictionary of the next 4 parameters.
+		@param filename: optional string, name ot the file to make
+		@param source: optional string, path to a directory
+		@param destination: optional string, path a directory
+		@param mode: string, optional mode to use to (de)compress with
 		@return boolean
 		'''
 		if self.loaded_type[0] not in ["Compression"]:
@@ -101,29 +103,29 @@ class CompressMap(object):
 		return self._run(infodict, fatal=fatal)
 
 
-	def extract(self, source, destination, mode='auto', fatal=True):
+	def extract(self, infodict=None, source=None, destination=None,
+			mode=None, fatal=True):
 		'''De-compression function
 
-		@param source: string, path to a directory or file
-		@param destination: string, path to a directoy
-		@param mode; string, desired method to perform the
-			compression or transfer, default is 'auto' for
-			automatic method determiantion
+		@param infodict: optional dictionary of the next 3 parameters.
+		@param source: optional string, path to a directory
+		@param destination: optional string, path a directory
+		@param mode: string, optional mode to use to (de)compress with
 		@return boolean
 		'''
-		if loaded_type[0] not in ["Decompression"]:
+		if self.loaded_type[0] not in ["Decompression"]:
 			return False
 		if not infodict:
-			infodict = create_infodict(source, destination, mode=mode)
+			infodict = self.create_infodict(source, destination, mode=mode)
 		if infodict['mode'] in ['auto', None]:
 			infodict['mode'] = self.get_extension(infodict['source'])
 			if not infodict['mode']:
 				print self.mode_error
 				return False
-		return self._run(unpack_info, fatal=fatal)
+		return self._run(infodict, fatal=fatal)
 
 
-	def _run(self, source, destination, mode, filename=None, fatal=True):
+	def _run(self, infodict, fatal=True):
 		'''Internal function that runs the designated function
 
 		@param source: string, path to a directory or file
@@ -132,16 +134,15 @@ class CompressMap(object):
 			compression or transfer
 		@return boolean
 		'''
-		if not self.is_supported(mode):
-			print "mode: %s is not supported in the current definitions" % mode
+		if not self.is_supported(infodict['mode']):
+			print "mode: %s is not supported in the current %s definitions" \
+				% (infodict['mode'], self.loaded_type[1])
 			return False
 		try:
-			success = getattr(self, self._map[mode].func)(
-				self.pair_files(source, destination, filename),
-				mode,
-				fatal)
+			func = getattr(self, self._map[infodict['mode']].func)
+			success = func(infodict, fatal)
 		except AttributeError:
-			print "FAILED to find function %s" % self._map[mode]
+			print "FAILED to find function %s" % self._map[infodict['mode']]
 			return False
 		#except Exception as e:
 			#msg = "Error performing %s %s, " % (mode, self.loaded_type[0]) + \
@@ -163,20 +164,24 @@ class CompressMap(object):
 		return source.rsplit(self.extension_separator, 1)[1]
 
 
-	def rsync(self, source, destination, mode=None, fatal=True):
-		'''Performs an rsync transfer
+	def rsync(self, infodict=None, source=None, destination=None,
+			mode=None, fatal=True):
+		'''Convienience function. Performs an rsync transfer
 
-		@param source: string, path to a directory
-		@param destination: string, path a directory
-		@param mode: string, mode to use to (de)compress with
+		@param infodict: optional dictionary of the next 3 parameters.
+		@param source: optional string, path to a directory
+		@param destination: optional string, path a directory
+		@param mode: string, optional mode to use to (de)compress with
 		@return boolean
 		'''
-		if not mode:
-			mode = 'rsync'
-		return self._run(source, destination, mode, fatal=fatal)
+		if not infodict:
+			if not mode:
+				mode = 'rsync'
+			infodict = self.create_infodict(source, destination, mode=mode)
+		return self._run(infodict, fatal=fatal)
 
 
-	def _common(self, files, mode=None, fatal=True):
+	def _common(self, infodict, fatal=True):
 		'''Internal function.  Performs commonly supported
 		compression or decompression.
 
@@ -184,10 +189,10 @@ class CompressMap(object):
 		@param mode: string, mode to use to (de)compress with
 		@return boolean
 		'''
-		if not mode:
-			print "ERROR: %s mode not set!" % self.loaded_type[0]
+		if not infodict['mode']:
+			print "ERROR: CompressMap; %s mode not set!" % self.loaded_type[0]
 			return False
-		cmdlist = self._map[mode]
+		cmdlist = self._map[infodict['mode']]
 		# Do the string substitution
 		opts = ' '.join(cmdlist.args) %(infodict)
 		args = ' '.join([cmdlist.cmd, opts])
@@ -196,7 +201,7 @@ class CompressMap(object):
 
 
 	@staticmethod
-	def pair_files(source, destination, filename=''):
+	def create_infodict(source, destination, filename='', mode=None):
 		'''Puts the source and destination paths into a dictionary
 		for use in string substitution in the defintions
 		%(source) and %(destination) fields embedded into the commands
