@@ -20,7 +20,8 @@ from catalyst.lock import LockInUse
 from catalyst.support import CatalystError, find_binary
 from catalyst.defaults import hash_definitions, confdefaults, option_messages
 from hash_utils import HashMap
-from defaults import  contents_definitions
+from defaults import  (contents_definitions, compress_definitions,
+	decompress_definitions)
 from contents import ContentsMap
 from catalyst.version import get_version
 
@@ -288,6 +289,11 @@ def main():
 	# initialze our hash and contents generators
 	hash_map = HashMap(hash_definitions)
 	conf_values["hash_map"] = hash_map
+
+	# initialize our (de)compression definitions
+	conf_values['decompress_definitions'] = decompress_definitions
+	conf_values['compress_definitions'] = compress_definitions
+	# TODO add capability to config/spec new definitions
 
 	# Start checking that digests are valid now that hash_map is initialized
 	if "digests" in conf_values:
