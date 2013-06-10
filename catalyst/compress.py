@@ -204,9 +204,11 @@ class CompressMap(object):
 		@param mode: string, mode to use to (de)compress with
 		@return boolean
 		'''
-		if not infodict['mode']:
-			print "ERROR: CompressMap; %s mode not set!" % self.loaded_type[0]
+		if not infodict['mode'] or not self.is_supported(infodict['mode']):
+			print "ERROR: CompressMap; %s mode: %s not correctly set!" \
+				% (self.loaded_type[0], infodict['mode'])
 			return False
+
 		#Avoid modifying the source dictionary
 		cmdinfo = infodict.copy()
 
