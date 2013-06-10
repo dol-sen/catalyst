@@ -17,29 +17,32 @@ from collections import namedtuple
 from support import cmd
 
 
-# fields = ["func", "cmd", "args", "id"]
+definition_fields = ["func", "cmd", "args", "id", "extension"]
+
 compress_definitions = {
 	"Type": ["Compression", "Compression definitions loaded"],
-	"rsync"		:["rsync", "rsync", ["-a", "--delete", "%(source)s",  "%(destination)s"], "RSYNC"],
-	"lbz2"		:["_common", "tar", ["-I", "lbzip2", "-cf", "%(filename)s", "-C", "%(destination)s", "%(source)s"], "LBZIP2"],
-	"bz2"		:["_common", "tar", ["-cpjf", "%(filename)s", "-C", "%(destination)s", "%(source)s"], "BZIP2"],
-	"tar"		:["_common", "tar", ["-cpf", "%(filename)s", "-C", "%(destination)s", "%(source)s"], "TAR"],
-	"xz"		:["_common", "tar", ["-cpJf", "%(filename)s", "-C", "%(destination)s", "%(source)s"], "XZ"],
-	"pixz"		:["_common", "tar", ["-I", "pixz", "-cpf", "%(filename)s", "-C", "%(destination)s", "%(source)s"], "PIXZ"],
-	"zip"		:["_common", "tar", ["-cpzf", "%(filename)s", "-C", "%(destination)s", "%(source)s"], "GZIP"],
+	"rsync"		:["rsync", "rsync", ["-a", "--delete", "%(source)s",  "%(destination)s"], "RSYNC", None],
+	"lbzip2"		:["_common", "tar", ["-I", "lbzip2", "-cf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "LBZIP2", "tbz2"],
+	"tbz2"		:["_common", "tar", ["-I", "lbzip2", "-cf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "LBZIP2", "tbz2"],
+	"bz2"		:["_common", "tar", ["-cpjf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "BZIP2", "tar.bz2"],
+	"tar"		:["_common", "tar", ["-cpf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "TAR", "tar"],
+	"xz"		:["_common", "tar", ["-cpJf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "XZ", "tar.xz"],
+	"pixz"		:["_common", "tar", ["-I", "pixz", "-cpf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "PIXZ", "xz"],
+	"zip"		:["_common", "tar", ["-cpzf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "GZIP", "zip"],
 	}
 
 
-# fields = ["func", "cmd", "args", "id"]
 decompress_definitions = {
 	"Type": ["Decompression", "Decompression definitions loaded"],
-	"rsync"		:["rsync", "rsync", ["-a", "--delete", "%(source)s", "%(destination)s"], "RSYNC"],
-	"bz2"		:["_common", "tar", ["-I", "lbzip2", "-xpf", "%(source)s", "-C", "%(destination)s"], "LBZIP2"],
-	"tar"		:["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "TAR"],
-	"xz"		:["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "XZ"],
-	"pixz"		:["_common", "tar", ["-I", "pixz", "-xpf", "%(source)s", "-C", "%(destination)s"], "PIXZ"],
-	"zip"		:["_common", "tar", ["-xpzf", "%(source)s", "-C", "%(destination)s"], "GZIP"],
-	"gz"		:["_common", "tar", ["-xpzf", "%(source)s", "-C", "%(destination)s"], "GZIP"],
+	"rsync"		:["rsync", "rsync", ["-a", "--delete", "%(source)s", "%(destination)s"], "RSYNC", None],
+	"lbzip2"		:["_common", "tar", ["-I", "lbzip2", "-xpf", "%(source)s", "-C", "%(destination)s"], "LBZIP2", "bz2"],
+	"tbz2"		:["_common", "tar", ["-I", "lbzip2", "-xpf", "%(source)s", "-C", "%(destination)s"], "LBZIP2", "tbz2"],
+	"bz2"		:["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "BZIP2", "bz2"],
+	"tar"		:["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "TAR", "tar"],
+	"xz"		:["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "XZ", "xz"],
+	"pixz"		:["_common", "tar", ["-I", "pixz", "-xpf", "%(source)s", "-C", "%(destination)s"], "PIXZ", "xz"],
+	"zip"		:["_common", "tar", ["-xpzf", "%(source)s", "-C", "%(destination)s"], "GZIP", "zip"],
+	"gz"		:["_common", "tar", ["-xpzf", "%(source)s", "-C", "%(destination)s"], "GZIP", "zip"],
 	}
 
 
@@ -51,7 +54,7 @@ class CompressMap(object):
 	Catalyst's compression & decompression of archives'''
 
 	'''fields: list of ordered field names for the (de)compression functions'''
-	fields = ["func", "cmd", "args", "id"]
+	fields = definition_fields[:]
 
 
 	def __init__(self, definitions=None, env=None, separator=extension_separator):
