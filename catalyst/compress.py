@@ -93,7 +93,7 @@ class CompressMap(object):
 
 
 	def compress(self, infodict=None, filename='', source=None,
-			target_dir=None, mode=None, auto_extension=False, fatal=True):
+			basedir='.', mode=None, auto_extension=False, fatal=True):
 		'''Compression function
 
 		@param infodict: optional dictionary of the next 4 parameters.
@@ -157,7 +157,7 @@ class CompressMap(object):
 			func = getattr(self, self._map[infodict['mode']].func)
 			success = func(infodict, fatal)
 		except AttributeError:
-			print "FAILED to find function %s" % self._map[infodict['mode']]
+			print "FAILED to find function '%s'" % str(self._map[infodict['mode']].func)
 			return False
 		#except Exception as e:
 			#msg = "Error performing %s %s, " % (mode, self.loaded_type[0]) + \
@@ -223,14 +223,8 @@ class CompressMap(object):
 		return cmd(args, cmdlist.id, env=self.env, fatal=fatal)
 
 
-<<<<<<< HEAD
-	@staticmethod
-	def create_infodict(source, destination, filename='', mode=None,
-			auto_extension=True):
-=======
 	def create_infodict(self, source, destination=None, basedir=None,
 			filename='', mode=None, auto_extension=False):
->>>>>>> 14bee23... Add default_mode capability
 		'''Puts the source and destination paths into a dictionary
 		for use in string substitution in the defintions
 		%(source) and %(destination) fields embedded into the commands
@@ -243,12 +237,9 @@ class CompressMap(object):
 		return {
 			'source': source,
 			'destination': destination,
+			'basedir': basedir,
 			'filename': filename,
-<<<<<<< HEAD
-			'mode': mode,
-=======
 			'mode': mode or self.mode,
->>>>>>> 14bee23... Add default_mode capability
 			'auto-ext': auto_extension,
 			}
 
