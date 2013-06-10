@@ -57,12 +57,14 @@ class CompressMap(object):
 	fields = definition_fields[:]
 
 
-	def __init__(self, definitions=None, env=None, separator=extension_separator):
+	def __init__(self, definitions=None, env=None,
+			default_mode=None, separator=extension_separator):
 		'''Class init
 
 		@param compress_mode: boolean, defaults to True
 			describes compression or de-compression definitions loaded
-		@param definitions: dictionary of Key:[function, cmd, cmd_args, Print/id string]
+		@param definitions: dictionary of
+			Key:[function, cmd, cmd_args, Print/id string, extension]
 		@param env: environment to pass to the cmd subprocess
 		'''
 		if definitions is None:
@@ -75,6 +77,12 @@ class CompressMap(object):
 			" Error: No mode was passed in or automatically detected"
 		self._map = {}
 		self.extension_separator = separator
+		if default_mode:
+			self.mode = default_mode
+		elif self.loaded_type[0] in ['Compression']:
+			self.mode = 'tbz2'
+		else:
+			self.mode = 'auto'
 
 		# create the (de)compression definition namedtuple classes
 		for name in list(definitions):
@@ -103,8 +111,8 @@ class CompressMap(object):
 		if not infodict['mode']:
 			print self.mode_error
 			return False
-		if infodict['auto-ext'] or auto_extension:
-			infodict['filename'] += self.extension_separator + infodict['mode']
+		if auto_extension:
+			infodict['auto-ext'] = True
 		return self._run(infodict, fatal=fatal)
 
 
@@ -122,7 +130,9 @@ class CompressMap(object):
 			return False
 		if not infodict:
 			infodict = self.create_infodict(source, destination, mode=mode)
-		if infodict['mode'] in ['auto', None]:
+		if infodict['mode'] in [None]:
+			infodict['mode'] = self.mode or 'auto'
+		if infodict['mode'] in ['auto']:
 			infodict['mode'] = self.get_extension(infodict['source'])
 			if not infodict['mode']:
 				print self.mode_error
@@ -197,17 +207,30 @@ class CompressMap(object):
 		if not infodict['mode']:
 			print "ERROR: CompressMap; %s mode not set!" % self.loaded_type[0]
 			return False
-		cmdlist = self._map[infodict['mode']]
+		#Avoid modifying the source dictionary
+		cmdinfo = infodict.copy()
+
+		cmdlist = self._map[cmdinfo['mode']]
+
+		if cmdinfo['auto-ext']:
+			cmdinfo['filename'] += self.extension_separator + \
+				self._map[cmdinfo['mode']].extension
+
 		# Do the string substitution
-		opts = ' '.join(cmdlist.args) %(infodict)
+		opts = ' '.join(cmdlist.args) %(cmdinfo)
 		args = ' '.join([cmdlist.cmd, opts])
 
 		return cmd(args, cmdlist.id, env=self.env, fatal=fatal)
 
 
+<<<<<<< HEAD
 	@staticmethod
 	def create_infodict(source, destination, filename='', mode=None,
 			auto_extension=True):
+=======
+	def create_infodict(self, source, destination=None, basedir=None,
+			filename='', mode=None, auto_extension=False):
+>>>>>>> 14bee23... Add default_mode capability
 		'''Puts the source and destination paths into a dictionary
 		for use in string substitution in the defintions
 		%(source) and %(destination) fields embedded into the commands
@@ -221,7 +244,11 @@ class CompressMap(object):
 			'source': source,
 			'destination': destination,
 			'filename': filename,
+<<<<<<< HEAD
 			'mode': mode,
+=======
+			'mode': mode or self.mode,
+>>>>>>> 14bee23... Add default_mode capability
 			'auto-ext': auto_extension,
 			}
 
