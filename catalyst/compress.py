@@ -36,7 +36,8 @@ decompress_definitions = {
 	"rsync"		:["rsync", "rsync", ["-a", "--delete", "%(source)s", "%(destination)s"], "RSYNC"],
 	"bz2"		:["_common", "tar", ["-I", "lbzip2", "-xpf", "%(source)s", "-C", "%(destination)s"], "LBZIP2"],
 	"tar"		:["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "TAR"],
-	"xz"		:["_common", "tar", ["-I", "pixz", "-xpf", "%(source)s", "-C", "%(destination)s"], "PIXZ"],
+	"xz"		:["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "XZ"],
+	"pixz"		:["_common", "tar", ["-I", "pixz", "-xpf", "%(source)s", "-C", "%(destination)s"], "PIXZ"],
 	"zip"		:["_common", "tar", ["-xpzf", "%(source)s", "-C", "%(destination)s"], "GZIP"],
 	"gz"		:["_common", "tar", ["-xpzf", "%(source)s", "-C", "%(destination)s"], "GZIP"],
 	}
