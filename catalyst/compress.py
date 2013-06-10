@@ -216,7 +216,7 @@ class CompressMap(object):
 
 		if cmdinfo['auto-ext']:
 			cmdinfo['filename'] += self.extension_separator + \
-				self._map[cmdinfo['mode']].extension
+				cmdlist.extension
 
 		# Do the string substitution
 		opts = ' '.join(cmdlist.args) %(cmdinfo)
@@ -273,3 +273,15 @@ class CompressMap(object):
 		if source.endswith(self._map[prefered_mode].extension):
 			return prefered_mode
 		return self.get_extension(source)
+
+
+	def extension(self, mode):
+		'''Returns the predetermined extension auto-ext added
+		to the filename for compression.
+
+		@param mode: string
+		@return string
+		'''
+		if self.is_supported(mode):
+			return self._map[mode].extension
+		return ''
