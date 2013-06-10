@@ -258,3 +258,16 @@ class CompressMap(object):
 	def available_modes(self):
 		'''Convienence function to return the available modes'''
 		return list(self._map)
+
+
+	def best_mode(self, prefered_mode, source):
+		'''Compare the prefered_mode's extension with the source extension
+		and returns the best choice
+
+		@param prefered_mode: string
+		@param source: string, path teh the source file
+		@return string: best mode to use for the extraction
+		'''
+		if source.endswith(self._map[prefered_mode].extension):
+			return prefered_mode
+		return self.get_extension(source)
