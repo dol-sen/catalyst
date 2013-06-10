@@ -17,6 +17,7 @@ from catalyst.defaults import target_mounts
 from catalyst.lock import LockDir
 from catalyst.fileops import ensure_dirs, pjoin
 from catalyst.base.resume import AutoResume
+from catalyst.compress import CompressMap
 
 class StageBase(TargetBase, ClearBase, GenBase):
 	"""
@@ -250,6 +251,13 @@ class StageBase(TargetBase, ClearBase, GenBase):
 			self.env["PORT_LOGDIR"]=self.settings["port_logdir"]
 			self.env["PORT_LOGDIR_CLEAN"]='find "${PORT_LOGDIR}" -type f ! -name "summary.log*" -mtime +30 -delete'
 
+		# Initialize our (de)compressor's)
+		self.decompressor = CompressMap(self.settings["decompress_definitions"],
+			env=self.env, default_mode=self.settings['decompression_mode'])
+
+		# save resources, it is not always needed
+		self.compressor = None
+
 	def override_cbuild(self):
 		if "CBUILD" in self.makeconf:
 			self.settings["CBUILD"]=self.makeconf["CBUILD"]
@@ -314,7 +322,7 @@ class StageBase(TargetBase, ClearBase, GenBase):
 
 	def set_target_path(self):
 		self.settings["target_path"]=normpath(self.settings["storedir"]+\
-			"/builds/"+self.settings["target_subpath"].rstrip('/')+".tar.bz2")
+			"/builds/"+self.settings["target_subpath"])
 		if "autoresume" in self.settings["options"]\
 			and self.resume.is_enabled("setup_target_path"):
 			print \
@@ -398,7 +406,7 @@ class StageBase(TargetBase, ClearBase, GenBase):
 				"/tmp/"+self.settings["source_subpath"])
 		else:
 			self.settings["source_path"]=normpath(self.settings["storedir"]+\
-				"/builds/"+self.settings["source_subpath"].rstrip('/')+".tar.bz2")
+				"/builds/"+self.settings["source_subpath"])
 			if os.path.isfile(self.settings["source_path"]):
 				# XXX: Is this even necessary if the previous check passes?
 				if os.path.exists(self.settings["source_path"]):
@@ -413,7 +421,7 @@ class StageBase(TargetBase, ClearBase, GenBase):
 			print "\tseedcache in the options of catalyst.conf the source path"
 			print "\twill then be "+\
 				normpath(self.settings["storedir"]+"/builds/"+\
-				self.settings["source_subpath"].rstrip('/')+".tar.bz2\n")
+					self.settings["source_subpath"]+"\n")
 
 	def set_dest_path(self):
 		if "root_path" in self.settings:
@@ -440,7 +448,7 @@ class StageBase(TargetBase, ClearBase, GenBase):
 		else:
 			self.settings["snapshot_path"]=normpath(self.settings["storedir"]+\
 				"/snapshots/" + self.settings["snapshot_name"] +
-				self.settings["snapshot"].rstrip('/')+".tar.bz2")
+				self.settings["snapshot"])
 
 			if os.path.exists(self.settings["snapshot_path"]):
 				self.settings["snapshot_path_hash"]=\
@@ -665,47 +673,34 @@ class StageBase(TargetBase, ClearBase, GenBase):
 
 		clst_unpack_hash = self.resume.get("unpack")
 
+		unpack_info = {
+			'source': self.settings["source_path"],
+			"destination": self.settings["chroot_path"],
+			'mode': None,
+			'auto-ext': False,
+			}
+
+		display_msg="\nStarting %(mode)s from %(source)s\nto "+\
+			"%(destination)s (This may take some time) ...\n"
+
+		error_msg="'%(mode)s' extraction of %(source)s to %(destination)s failed."
+
 		if "seedcache" in self.settings["options"]:
-			if os.path.isdir(self.settings["source_path"]):
+			if os.path.isdir(unpack_info["source"]):
 				""" SEEDCACHE Is a directory, use rsync """
-				unpack_cmd="rsync -a --delete "+self.settings["source_path"]+\
-					" "+self.settings["chroot_path"]
-				display_msg="\nStarting rsync from "+\
-					self.settings["source_path"]+"\nto "+\
-					self.settings["chroot_path"]+\
-					" (This may take some time) ...\n"
-				error_msg="Rsync of "+self.settings["source_path"]+" to "+\
-					self.settings["chroot_path"]+" failed."
+				unpack_info['mode'] = "rsync"
 			else:
 				""" SEEDCACHE is a not a directory, try untar'ing """
 				print "Referenced SEEDCACHE does not appear to be a directory, trying to untar..."
-				display_msg="\nStarting tar extract from "+\
-					self.settings["source_path"]+"\nto "+\
-					self.settings["chroot_path"]+\
-						" (This may take some time) ...\n"
-				if "bz2" == self.settings["chroot_path"][-3:]:
-					unpack_cmd="tar -I lbzip2 -xpf "+self.settings["source_path"]+" -C "+\
-						self.settings["chroot_path"]
-				else:
-					unpack_cmd="tar xpf "+self.settings["source_path"]+" -C "+\
-						self.settings["chroot_path"]
-				error_msg="Tarball extraction of "+\
-					self.settings["source_path"]+" to "+\
-					self.settings["chroot_path"]+" failed."
+				unpack_info['mode'] = self.decompressor.best_mode(
+						self.settings['decompression_mode'],
+						self.settings["source_path"])
 		else:
 			""" No SEEDCACHE, use tar """
-			display_msg="\nStarting tar extract from "+\
-				self.settings["source_path"]+"\nto "+\
-				self.settings["chroot_path"]+\
-				" (This may take some time) ...\n"
-			if "bz2" == self.settings["chroot_path"][-3:]:
-				unpack_cmd="tar -I lbzip2 -xpf "+self.settings["source_path"]+" -C "+\
-					self.settings["chroot_path"]
-			else:
-				unpack_cmd="tar xpf "+self.settings["source_path"]+" -C "+\
-					self.settings["chroot_path"]
-			error_msg="Tarball extraction of "+self.settings["source_path"]+\
-				" to "+self.settings["chroot_path"]+" failed."
+			unpack_info['mode'] = self.decompressor.best_mode(
+					self.settings['decompression_mode'],
+					unpack_info["source"])
+		# endif "seedcache"
 
 		if "autoresume" in self.settings["options"]:
 			if os.path.isdir(self.settings["source_path"]) \
@@ -752,6 +747,7 @@ class StageBase(TargetBase, ClearBase, GenBase):
 					""" We should never reach this, so something is very wrong """
 					raise CatalystError(
 						"source path is a dir but seedcache is not enabled")
+		# endif "autoresume"
 
 		if _unpack:
 			self.mount_safety_check()
@@ -775,8 +771,11 @@ class StageBase(TargetBase, ClearBase, GenBase):
 			if "kerncache" in self.settings["options"]:
 				ensure_dirs(self.settings["kerncache_path"],mode=0755)
 
-			print display_msg
-			cmd(unpack_cmd,error_msg,env=self.env)
+			print display_msg %(unpack_info)
+
+			# now run the decompressor
+			if not self.decompressor.extract(unpack_info):
+				print error_msg %(unpack_info)
 
 			if "source_path_hash" in self.settings:
 				self.resume.enable("unpack",
@@ -790,16 +789,23 @@ class StageBase(TargetBase, ClearBase, GenBase):
 		unpack=True
 		snapshot_hash = self.resume.get("unpack_portage")
 
+		unpack_errmsg="Error unpacking snapshot using mode %(mode)s"
+
+		unpack_info = {
+			'source': self.settings["snapshot_path"],
+			'destination': self.settings["snapshot_cache_path"],
+			'mode': None,
+			'auto-ext': False,
+			}
+
 		if "snapcache" in self.settings["options"]:
 			snapshot_cache_hash=\
 				read_from_clst(self.settings["snapshot_cache_path"]+\
 				"catalyst-hash")
-			destdir=self.settings["snapshot_cache_path"]
-			if "bz2" == self.settings["chroot_path"][-3:]:
-				unpack_cmd="tar -I lbzip2 -xpf "+self.settings["snapshot_path"]+" -C "+destdir
-			else:
-				unpack_cmd="tar xpf "+self.settings["snapshot_path"]+" -C "+destdir
-			unpack_errmsg="Error unpacking snapshot"
+			unpack_info['mode'] = self.decompressor.best_mode(
+				self.settings['decompression_mode'],
+				unpack_info['source'])
+
 			cleanup_msg="Cleaning up invalid snapshot cache at \n\t"+\
 				self.settings["snapshot_cache_path"]+\
 				" (This can take a long time)..."
@@ -810,17 +816,14 @@ class StageBase(TargetBase, ClearBase, GenBase):
 				print "Valid snapshot cache, skipping unpack of portage tree..."
 				unpack=False
 		else:
-			destdir=normpath(self.settings["chroot_path"] + self.settings["portdir"])
 			cleanup_errmsg="Error removing existing snapshot directory."
 			cleanup_msg=\
 				"Cleaning up existing portage tree (This can take a long time)..."
-			if "bz2" == self.settings["chroot_path"][-3:]:
-				unpack_cmd="tar -I lbzip2 -xpf "+self.settings["snapshot_path"]+" -C "+\
-					self.settings["chroot_path"]+"/usr"
-			else:
-				unpack_cmd="tar xpf "+self.settings["snapshot_path"]+" -C "+\
-					self.settings["chroot_path"]+"/usr"
-			unpack_errmsg="Error unpacking snapshot"
+			unpack_info['destination'] = normpath(
+				self.settings["chroot_path"] + self.settings["portdir"])
+			unpack_info['mode'] = self.decompressor.best_mode(
+				self.settings['decompression_mode'],
+				unpack_info['source'])
 
 			if "autoresume" in self.settings["options"] \
 				and os.path.exists(self.settings["chroot_path"] +
@@ -834,14 +837,15 @@ class StageBase(TargetBase, ClearBase, GenBase):
 		if unpack:
 			if "snapcache" in self.settings["options"]:
 				self.snapshot_lock_object.write_lock()
-			if os.path.exists(destdir):
+			if os.path.exists(unpack_info['destination']):
 				print cleanup_msg
-				cleanup_cmd="rm -rf "+destdir
+				cleanup_cmd="rm -rf "+unpack_info['destination']
 				cmd(cleanup_cmd,cleanup_errmsg,env=self.env)
-			ensure_dirs(destdir,mode=0755)
+			ensure_dirs(unpack_info['destination'],mode=0755)
 
 			print "Unpacking portage tree (This can take a long time) ..."
-			cmd(unpack_cmd,unpack_errmsg,env=self.env)
+			if not self.decompressor.extract(unpack_info):
+				print unpack_errmsg %(unpack_info)
 
 			if "snapcache" in self.settings["options"]:
 				myf=open(self.settings["snapshot_cache_path"]+"catalyst-hash","w")
@@ -1226,6 +1230,12 @@ class StageBase(TargetBase, ClearBase, GenBase):
 				raise CatalystError("Build failed, could not execute preclean")
 
 	def capture(self):
+		# initialize it here so it doesn't use
+		# resources if it is not needed
+		if not self.compressor:
+			self.compressor = CompressMap(self.settings["compress_definitions"],
+				env=self.env, default_mode=self.settings['compression_mode'])
+
 		if "autoresume" in self.settings["options"] \
 			and self.resume.is_enabled("capture"):
 			print "Resume point detected, skipping capture operation..."
@@ -1237,16 +1247,24 @@ class StageBase(TargetBase, ClearBase, GenBase):
 			""" Now make sure path exists """
 			ensure_dirs(mypath)
 
+			pack_info = self.compressor.create_infodict(
+				source=".",
+				basedir=self.settings["stage_path"],
+				filename=self.settings["target_path"],
+				mode=self.settings["compression_mode"],
+				auto_extension=True
+				)
+			target_filename = ".".join([self.settings["target_path"],
+				self.compressor.extension(pack_info['mode'])])
+
 			print "Creating stage tarball..."
 
-			cmd("tar -I lbzip2 -cpf "+self.settings["target_path"]+" -C "+\
-				self.settings["stage_path"]+" .",\
-				"Couldn't create stage tarball",env=self.env)
-
-			self.gen_contents_file(self.settings["target_path"])
-			self.gen_digest_file(self.settings["target_path"])
-
-			self.resume.enable("capture")
+			if self.compressor.compress(pack_info):
+				self.gen_contents_file(target_filename)
+				self.gen_digest_file(target_filename)
+				self.resume.enable("capture")
+			else:
+				print "Couldn't create stage tarball:", target_filename
 
 	def run_local(self):
 		#print "run_local()"
