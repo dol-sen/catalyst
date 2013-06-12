@@ -18,7 +18,11 @@ from support import cmd
 
 
 definition_fields = ["func", "cmd", "args", "id", "extension"]
+defintition_types = [ str,    str,   list,   str,  str]
 
+'''The definition entries are to follow the the definition_types
+with the exception of the first entry "Type" which is a mode identifier
+for use in the class as a type ID and printable string.'''
 compress_definitions = {
 	"Type": ["Compression", "Compression definitions loaded"],
 	"rsync"		:["rsync", "rsync", ["-a", "--delete", "%(source)s",  "%(destination)s"], "RSYNC", None],
@@ -46,6 +50,8 @@ decompress_definitions = {
 	}
 
 
+'''Configure this here in case it is ever changed.
+This is the only edit point required then.'''
 extension_separator = '.'
 
 
