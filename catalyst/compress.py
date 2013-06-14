@@ -12,6 +12,7 @@ and de-compression of files.  Including rsync transfers.
 '''
 
 
+import os
 from collections import namedtuple
 
 from support import cmd
@@ -180,9 +181,10 @@ class CompressMap(object):
 		@param source: string, file path of the file to determine
 		@return string: file type extension of the source file
 		'''
-		if self.extension_separator not in source:
-			return None
-		return source.rsplit(self.extension_separator, 1)[1]
+		#if self.extension_separator not in source:
+			#return None
+		#return source.rsplit(self.extension_separator, 1)[1]
+		return os.path.splitext(source)[1]
 
 
 	def rsync(self, infodict=None, source=None, destination=None,
