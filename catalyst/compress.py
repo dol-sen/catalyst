@@ -56,6 +56,24 @@ This is the only edit point required then.'''
 extension_separator = '.'
 
 
+def create_classes(definitions, fields):
+	'''This function dynamically creates the namedtuple classes which are
+	used for the information they contain in a consistent manner.
+
+	@parm definitions: dict, of (de)compressor definitions
+		see definition_fields and defintition_types defined in this
+		library.
+	@return class_map: dictionary of key: namedtuple class instance
+	'''
+	class_map = {}
+	for name in list(definitions):
+		obj = namedtuple(name, fields)
+		obj.__slots__ = ()
+		class_map[name] = obj._make(definitions[name])
+	del obj
+	return class_map
+
+
 class CompressMap(object):
 	'''Class for handling
 	Catalyst's compression & decompression of archives'''
@@ -93,13 +111,8 @@ class CompressMap(object):
 			self.mode = default_mode or 'auto'
 			self.compress = None
 			self.extract = self._extract
-
 		# create the (de)compression definition namedtuple classes
-		for name in list(definitions):
-			obj = namedtuple(name, self.fields)
-			obj.__slots__ = ()
-			self._map[name] = obj._make(definitions[name])
-		del obj
+		self._map = self.create_classes(definitions, self.fields)
 
 
 	def _compress(self, infodict=None, filename='', source=None,
