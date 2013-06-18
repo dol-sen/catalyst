@@ -84,12 +84,15 @@ class CompressMap(object):
 			" Error: No mode was passed in or automatically detected"
 		self._map = {}
 		self.extension_separator = separator
-		if default_mode:
-			self.mode = default_mode
-		elif self.loaded_type[0] in ['Compression']:
-			self.mode = 'tbz2'
+		# set some defaults depending on what is being loaded
+		if self.loaded_type[0] in ['Compression']:
+			self.mode = default_mode or 'tbz2'
+			self.compress = self._compress
+			self.extract = None
 		else:
-			self.mode = 'auto'
+			self.mode = default_mode or 'auto'
+			self.compress = None
+			self.extract = self._extract
 
 		# create the (de)compression definition namedtuple classes
 		for name in list(definitions):
@@ -99,7 +102,7 @@ class CompressMap(object):
 		del obj
 
 
-	def compress(self, infodict=None, filename='', source=None,
+	def _compress(self, infodict=None, filename='', source=None,
 			basedir='.', mode=None, auto_extension=False, fatal=True):
 		'''Compression function
 
@@ -110,8 +113,6 @@ class CompressMap(object):
 		@param mode: string, optional mode to use to (de)compress with
 		@return boolean
 		'''
-		if self.loaded_type[0] not in ["Compression"]:
-			return False
 		if not infodict:
 			infodict = self.create_infodict(source, None,
 				basedir, filename, mode or self.mode, auto_extension)
@@ -123,7 +124,7 @@ class CompressMap(object):
 		return self._run(infodict, fatal=fatal)
 
 
-	def extract(self, infodict=None, source=None, destination=None,
+	def _extract(self, infodict=None, source=None, destination=None,
 			mode=None, fatal=True):
 		'''De-compression function
 
@@ -275,7 +276,7 @@ class CompressMap(object):
 		and returns the best choice
 
 		@param prefered_mode: string
-		@param source: string, path teh the source file
+		@param source: string, path the the source file
 		@return string: best mode to use for the extraction
 		'''
 		if source.endswith(self._map[prefered_mode].extension):
