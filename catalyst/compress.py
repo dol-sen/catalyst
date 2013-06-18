@@ -7,7 +7,8 @@
 compress.py
 
 Utility class to hold and handle all possible compression
-and de-compression of files.  Including rsync transfers.
+and de-compression of files using native linux utilities.
+Including rsync transfers.
 
 '''
 
@@ -21,33 +22,55 @@ from support import cmd
 definition_fields = ["func", "cmd", "args", "id", "extension"]
 defintition_types = [ str,    str,   list,   str,  str]
 
+definition_help = \
 '''The definition entries are to follow the the definition_types
 with the exception of the first entry "Type" which is a mode identifier
-for use in the class as a type ID and printable string.'''
+for use in the class as a type ID and printable output string.
+
+Definiton entries are composed of the following:
+    access key: list of definition fields values.
+    eg:
+    "tar"       :["_common", "tar", ["-cpf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "TAR", "tar"],
+    access key  : list of definition_fields
+                 ["func", <== the class function to use to run the external utility with
+                             "cmd", <==  the external utility command
+                                     "args", <==  a list of the arguments to pass to the utility
+                                                                                                  "id", <== ID string that identifies the utility
+                                                                                                        "extension"], <== the file extension normally associated with this type
+
+Available named string variables that will be substituted with the passed in
+values during run time:
+"%(filename)s"      filename parameter to pass to the utility
+"%(basedir)s"       the base source directory where source originates from
+"%(source)s"        the file or directory being acted upon
+"%(destination)s"   the destination file or directory
+'''
+
+
 compress_definitions = {
-	"Type": ["Compression", "Compression definitions loaded"],
-	"rsync"		:["rsync", "rsync", ["-a", "--delete", "%(source)s",  "%(destination)s"], "RSYNC", None],
-	"lbzip2"		:["_common", "tar", ["-I", "lbzip2", "-cf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "LBZIP2", "tbz2"],
-	"tbz2"		:["_common", "tar", ["-I", "lbzip2", "-cf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "LBZIP2", "tbz2"],
-	"bz2"		:["_common", "tar", ["-cpjf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "BZIP2", "tar.bz2"],
-	"tar"		:["_common", "tar", ["-cpf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "TAR", "tar"],
-	"xz"		:["_common", "tar", ["-cpJf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "XZ", "tar.xz"],
-	"pixz"		:["_common", "tar", ["-I", "pixz", "-cpf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "PIXZ", "xz"],
-	"zip"		:["_common", "tar", ["-cpzf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "GZIP", "zip"],
+	"Type"      :["Compression", "Compression definitions loaded"],
+	"rsync"     :["rsync", "rsync", ["-a", "--delete", "%(source)s",  "%(destination)s"], "RSYNC", None],
+	"lbzip2"    :["_common", "tar", ["-I", "lbzip2", "-cf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "LBZIP2", "tbz2"],
+	"tbz2"      :["_common", "tar", ["-I", "lbzip2", "-cf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "LBZIP2", "tbz2"],
+	"bz2"       :["_common", "tar", ["-cpjf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "BZIP2", "tar.bz2"],
+	"tar"       :["_common", "tar", ["-cpf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "TAR", "tar"],
+	"xz"        :["_common", "tar", ["-cpJf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "XZ", "tar.xz"],
+	"pixz"      :["_common", "tar", ["-I", "pixz", "-cpf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "PIXZ", "xz"],
+	"zip"       :["_common", "tar", ["-cpzf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "GZIP", "zip"],
 	}
 
 
 decompress_definitions = {
-	"Type": ["Decompression", "Decompression definitions loaded"],
-	"rsync"		:["rsync", "rsync", ["-a", "--delete", "%(source)s", "%(destination)s"], "RSYNC", None],
-	"lbzip2"		:["_common", "tar", ["-I", "lbzip2", "-xpf", "%(source)s", "-C", "%(destination)s"], "LBZIP2", "bz2"],
-	"tbz2"		:["_common", "tar", ["-I", "lbzip2", "-xpf", "%(source)s", "-C", "%(destination)s"], "LBZIP2", "tbz2"],
-	"bz2"		:["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "BZIP2", "bz2"],
-	"tar"		:["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "TAR", "tar"],
-	"xz"		:["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "XZ", "xz"],
-	"pixz"		:["_common", "tar", ["-I", "pixz", "-xpf", "%(source)s", "-C", "%(destination)s"], "PIXZ", "xz"],
-	"zip"		:["_common", "tar", ["-xpzf", "%(source)s", "-C", "%(destination)s"], "GZIP", "zip"],
-	"gz"		:["_common", "tar", ["-xpzf", "%(source)s", "-C", "%(destination)s"], "GZIP", "zip"],
+	"Type"      :["Decompression", "Decompression definitions loaded"],
+	"rsync"     :["rsync", "rsync", ["-a", "--delete", "%(source)s", "%(destination)s"], "RSYNC", None],
+	"lbzip2"    :["_common", "tar", ["-I", "lbzip2", "-xpf", "%(source)s", "-C", "%(destination)s"], "LBZIP2", "bz2"],
+	"tbz2"      :["_common", "tar", ["-I", "lbzip2", "-xpf", "%(source)s", "-C", "%(destination)s"], "LBZIP2", "tbz2"],
+	"bz2"       :["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "BZIP2", "bz2"],
+	"tar"       :["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "TAR", "tar"],
+	"xz"        :["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "XZ", "xz"],
+	"pixz"      :["_common", "tar", ["-I", "pixz", "-xpf", "%(source)s", "-C", "%(destination)s"], "PIXZ", "xz"],
+	"zip"       :["_common", "tar", ["-xpzf", "%(source)s", "-C", "%(destination)s"], "GZIP", "zip"],
+	"gz"        :["_common", "tar", ["-xpzf", "%(source)s", "-C", "%(destination)s"], "GZIP", "zip"],
 	}
 
 
@@ -63,12 +86,16 @@ def create_classes(definitions, fields):
 	@parm definitions: dict, of (de)compressor definitions
 		see definition_fields and defintition_types defined in this
 		library.
+	@param fields: list of the field names to create
 	@return class_map: dictionary of key: namedtuple class instance
 	'''
 	class_map = {}
 	for name in list(definitions):
+		# create the namedtuple class instance
 		obj = namedtuple(name, fields)
+		# reduce memory used by limiting it to the predefined fields variables
 		obj.__slots__ = ()
+		# now add ithe instance to our map
 		class_map[name] = obj._make(definitions[name])
 	del obj
 	return class_map
@@ -124,6 +151,11 @@ class CompressMap(object):
 		@param source: optional string, path to a directory
 		@param destination: optional string, path a directory
 		@param mode: string, optional mode to use to (de)compress with
+		@param auto_extension: boolean, optional, enables or disables
+			adding the normaL file extension defined by the mode used.
+			defaults to False
+		@param fatal: boolean, pass through variable
+			passed to the command subprocess handler
 		@return boolean
 		'''
 		if not infodict:
@@ -145,6 +177,8 @@ class CompressMap(object):
 		@param source: optional string, path to a directory
 		@param destination: optional string, path a directory
 		@param mode: string, optional mode to use to (de)compress with
+		@param fatal: boolean, pass through variable
+			passed to the command subprocess handler
 		@return boolean
 		'''
 		if self.loaded_type[0] not in ["Decompression"]:
@@ -164,10 +198,9 @@ class CompressMap(object):
 	def _run(self, infodict, fatal=True):
 		'''Internal function that runs the designated function
 
-		@param source: string, path to a directory or file
-		@param destination: string, path a directoy or file
-		@param mode; string, desired method to perform the
-			compression or transfer
+		@param infodict: dictionary of the next 3 parameters.
+		@param fatal: boolean, pass through variable
+			passed to the command subprocess handler
 		@return boolean
 		'''
 		if not self.is_supported(infodict['mode']):
@@ -195,9 +228,6 @@ class CompressMap(object):
 		@param source: string, file path of the file to determine
 		@return string: file type extension of the source file
 		'''
-		#if self.extension_separator not in source:
-			#return None
-		#return source.rsplit(self.extension_separator, 1)[1]
 		return os.path.splitext(source)[1]
 
 
@@ -205,10 +235,12 @@ class CompressMap(object):
 			mode=None, fatal=True):
 		'''Convienience function. Performs an rsync transfer
 
-		@param infodict: optional dictionary of the next 3 parameters.
+		@param infodict: dict as returned by this class's create_infodict()
 		@param source: optional string, path to a directory
 		@param destination: optional string, path a directory
 		@param mode: string, optional mode to use to (de)compress with
+		@param fatal: boolean, pass through variable
+			passed to the command subprocess handler
 		@return boolean
 		'''
 		if not infodict:
@@ -220,10 +252,11 @@ class CompressMap(object):
 
 	def _common(self, infodict, fatal=True):
 		'''Internal function.  Performs commonly supported
-		compression or decompression.
+		compression or decompression commands.
 
-		@param files: dict as returned by this class's pair_files()
-		@param mode: string, mode to use to (de)compress with
+		@param infodict: dict as returned by this class's create_infodict()
+		@param fatal: boolean, pass through variable
+			passed to the command subprocess handler
 		@return boolean
 		'''
 		if not infodict['mode'] or not self.is_supported(infodict['mode']):
@@ -234,8 +267,10 @@ class CompressMap(object):
 		#Avoid modifying the source dictionary
 		cmdinfo = infodict.copy()
 
+		# obtain the pointer to the mode class to use
 		cmdlist = self._map[cmdinfo['mode']]
 
+		# for compression, add the file extension if enabled
 		if cmdinfo['auto-ext']:
 			cmdinfo['filename'] += self.extension_separator + \
 				cmdlist.extension
@@ -244,6 +279,8 @@ class CompressMap(object):
 		opts = ' '.join(cmdlist.args) %(cmdinfo)
 		args = ' '.join([cmdlist.cmd, opts])
 
+		# now run the (de)compressor command in a subprocess
+		# return it's success/fail return value
 		return cmd(args, cmdlist.id, env=self.env, fatal=fatal)
 
 
@@ -255,7 +292,12 @@ class CompressMap(object):
 
 		@param source: string, path to a directory
 		@param destination: string, path a directory
+		@param basedir: optional string, path a directory
 		@param filename: optional string
+		@param mode: string, optional mode to use to (de)compress with
+		@param auto_extension: boolean, optional, enables or disables
+			adding the normaL file extension defined by the mode used.
+			defaults to False
 		@return dict:
 		'''
 		return {
