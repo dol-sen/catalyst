@@ -20,7 +20,7 @@ from support import cmd
 
 
 definition_fields = ["func", "cmd", "args", "id", "extension"]
-defintition_types = [ str,    str,   list,   str,  str]
+defintition_types = [ str,    str,   list,   str,  list]
 
 definition_help = \
 '''The definition entries are to follow the the definition_types
@@ -30,13 +30,13 @@ for use in the class as a type ID and printable output string.
 Definiton entries are composed of the following:
     access key: list of definition fields values.
     eg:
-    "tar"       :["_common", "tar", ["-cpf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "TAR", "tar"],
+    "tar"       :["_common", "tar", ["-cpf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "TAR", ["tar"]],
     access key  : list of definition_fields
                  ["func", <== the class function to use to run the external utility with
                              "cmd", <==  the external utility command
                                      "args", <==  a list of the arguments to pass to the utility
                                                                                                   "id", <== ID string that identifies the utility
-                                                                                                        "extension"], <== the file extension normally associated with this type
+                                                                                                        "extension"], <== the list of file extensions this command handles
 
 Available named string variables that will be substituted with the passed in
 values during run time:
@@ -50,27 +50,27 @@ values during run time:
 compress_definitions = {
 	"Type"      :["Compression", "Compression definitions loaded"],
 	"rsync"     :["rsync", "rsync", ["-a", "--delete", "%(source)s",  "%(destination)s"], "RSYNC", None],
-	"lbzip2"    :["_common", "tar", ["-I", "lbzip2", "-cf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "LBZIP2", "tbz2"],
-	"tbz2"      :["_common", "tar", ["-I", "lbzip2", "-cf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "LBZIP2", "tbz2"],
-	"bz2"       :["_common", "tar", ["-cpjf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "BZIP2", "tar.bz2"],
-	"tar"       :["_common", "tar", ["-cpf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "TAR", "tar"],
-	"xz"        :["_common", "tar", ["-cpJf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "XZ", "tar.xz"],
-	"pixz"      :["_common", "tar", ["-I", "pixz", "-cpf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "PIXZ", "xz"],
-	"zip"       :["_common", "tar", ["-cpzf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "GZIP", "zip"],
+	"lbzip2"    :["_common", "tar", ["-I", "lbzip2", "-cf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "LBZIP2", ["tbz2"]],
+	"tbz2"      :["_common", "tar", ["-I", "lbzip2", "-cf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "LBZIP2", ["tbz2"]],
+	"bz2"       :["_common", "tar", ["-cpjf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "BZIP2", ["tar.bz2"]],
+	"tar"       :["_common", "tar", ["-cpf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "TAR", ["tar"]],
+	"xz"        :["_common", "tar", ["-cpJf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "XZ", ["tar.xz"]],
+	"pixz"      :["_common", "tar", ["-I", "pixz", "-cpf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "PIXZ", ["xz"]],
+	"zip"       :["_common", "tar", ["-cpzf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "GZIP", ["zip"]],
 	}
 
 
 decompress_definitions = {
 	"Type"      :["Decompression", "Decompression definitions loaded"],
 	"rsync"     :["rsync", "rsync", ["-a", "--delete", "%(source)s", "%(destination)s"], "RSYNC", None],
-	"lbzip2"    :["_common", "tar", ["-I", "lbzip2", "-xpf", "%(source)s", "-C", "%(destination)s"], "LBZIP2", "bz2"],
-	"tbz2"      :["_common", "tar", ["-I", "lbzip2", "-xpf", "%(source)s", "-C", "%(destination)s"], "LBZIP2", "tbz2"],
-	"bz2"       :["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "BZIP2", "bz2"],
-	"tar"       :["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "TAR", "tar"],
-	"xz"        :["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "XZ", "xz"],
-	"pixz"      :["_common", "tar", ["-I", "pixz", "-xpf", "%(source)s", "-C", "%(destination)s"], "PIXZ", "xz"],
-	"zip"       :["_common", "tar", ["-xpzf", "%(source)s", "-C", "%(destination)s"], "GZIP", "zip"],
-	"gz"        :["_common", "tar", ["-xpzf", "%(source)s", "-C", "%(destination)s"], "GZIP", "zip"],
+	"lbzip2"    :["_common", "tar", ["-I", "lbzip2", "-xpf", "%(source)s", "-C", "%(destination)s"], "LBZIP2", ["bz2"]],
+	"tbz2"      :["_common", "tar", ["-I", "lbzip2", "-xpf", "%(source)s", "-C", "%(destination)s"], "LBZIP2", ["tbz2"]],
+	"bz2"       :["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "BZIP2", ["bz2"]],
+	"tar"       :["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "TAR", ["tar"]],
+	"xz"        :["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "XZ", ["xz"]],
+	"pixz"      :["_common", "tar", ["-I", "pixz", "-xpf", "%(source)s", "-C", "%(destination)s"], "PIXZ", ["xz"]],
+	"zip"       :["_common", "tar", ["-xpzf", "%(source)s", "-C", "%(destination)s"], "GZIP", ["zip"]],
+	"gz"        :["_common", "tar", ["-xpzf", "%(source)s", "-C", "%(destination)s"], "GZIP", ["zip"]],
 	}
 
 
@@ -273,7 +273,7 @@ class CompressMap(object):
 		# for compression, add the file extension if enabled
 		if cmdinfo['auto-ext']:
 			cmdinfo['filename'] += self.extension_separator + \
-				cmdlist.extension
+				self.extension(cmdinfo["mode"])
 
 		# Do the string substitution
 		opts = ' '.join(cmdlist.args) %(cmdinfo)
@@ -334,12 +334,13 @@ class CompressMap(object):
 		@param source: string, path the the source file
 		@return string: best mode to use for the extraction
 		'''
-		if source.endswith(self._map[prefered_mode].extension):
+		ext = self.get_extension(source)
+		if ext in self._map[prefered_mode].extension:
 			return prefered_mode
-		return self.get_extension(source)
+		return ext
 
 
-	def extension(self, mode):
+	def extension(self, mode, all_extensions=False):
 		'''Returns the predetermined extension auto-ext added
 		to the filename for compression.
 
@@ -347,5 +348,8 @@ class CompressMap(object):
 		@return string
 		'''
 		if self.is_supported(mode):
-			return self._map[mode].extension
+			if all_extensions:
+				return self._map[mode].extension
+			else: #return the first one (default)
+				return self._map[mode].extension[0]
 		return ''
