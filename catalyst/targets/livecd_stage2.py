@@ -79,6 +79,9 @@ class livecd_stage2(StageBase):
 					print_traceback=True)
 
 			myf.write("\n#Added by Catalyst:")
+			# workaround until config.py is using configparser
+			if isinstance(self.settings["livecd/modblacklist"], str):
+				self.settings["livecd/modblacklist"] = self.settings["livecd/modblacklist"].split()
 			for x in self.settings["livecd/modblacklist"]:
 				myf.write("\nblacklist "+x)
 			myf.close()
