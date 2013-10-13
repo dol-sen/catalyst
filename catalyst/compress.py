@@ -95,7 +95,7 @@ def create_classes(definitions, fields):
 		obj = namedtuple(name, fields)
 		# reduce memory used by limiting it to the predefined fields variables
 		obj.__slots__ = ()
-		# now add ithe instance to our map
+		# now add the instance to our map
 		class_map[name] = obj._make(definitions[name])
 	del obj
 	return class_map
