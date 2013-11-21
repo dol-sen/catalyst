@@ -44,33 +44,34 @@ values during run time:
 "%(basedir)s"       the base source directory where source originates from
 "%(source)s"        the file or directory being acted upon
 "%(destination)s"   the destination file or directory
+"%(arch)s"          the arch filter to pass in  ie. Available filters: x86, arm, armthumb, powerpc, sparc, ia64
 '''
 
 
 compress_definitions = {
 	"Type"      :["Compression", "Compression definitions loaded"],
 	"rsync"     :["rsync", "rsync", ["-a", "--delete", "%(source)s",  "%(destination)s"], "RSYNC", None],
-	"lbzip2"    :["_common", "tar", ["-I", "lbzip2", "-cf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "LBZIP2", ["tbz2"]],
+	"lbzip2"    :["_common", "tar", ["-I", "lbzip2", "-cf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "LBZIP2", ["tar.bz2"]],
 	"tbz2"      :["_common", "tar", ["-I", "lbzip2", "-cf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "LBZIP2", ["tbz2"]],
-	"bz2"       :["_common", "tar", ["-cpjf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "BZIP2", ["tar.bz2"]],
+	"bzip2"     :["_common", "tar", ["-cpjf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "BZIP2", ["tar.bz2"]],
 	"tar"       :["_common", "tar", ["-cpf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "TAR", ["tar"]],
 	"xz"        :["_common", "tar", ["-cpJf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "XZ", ["tar.xz"]],
-	"pixz"      :["_common", "tar", ["-I", "pixz", "-cpf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "PIXZ", ["xz"]],
-	"zip"       :["_common", "tar", ["-cpzf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "GZIP", ["zip"]],
+	"pixz"      :["_common", "tar", ["-I", "pixz", "-cpf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "PIXZ", ["tar.xz"]],
+	"gzip"      :["_common", "tar", ["-cpzf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "GZIP", ["tar.gz"]],
+	"squashfs"  :["_common", "mksquashfs", ["%(source)s", "%(destination)s", "-comp", "xz", "-Xbcj", "%(arch)s", "-b", "1M"], "SQUASHFS", [".squashfs", ".sfs"]],
 	}
 
 
 decompress_definitions = {
 	"Type"      :["Decompression", "Decompression definitions loaded"],
 	"rsync"     :["rsync", "rsync", ["-a", "--delete", "%(source)s", "%(destination)s"], "RSYNC", None],
-	"lbzip2"    :["_common", "tar", ["-I", "lbzip2", "-xpf", "%(source)s", "-C", "%(destination)s"], "LBZIP2", ["bz2"]],
-	"tbz2"      :["_common", "tar", ["-I", "lbzip2", "-xpf", "%(source)s", "-C", "%(destination)s"], "LBZIP2", ["tbz2"]],
-	"bz2"       :["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "BZIP2", ["bz2"]],
+	"lbzip2"    :["_common", "tar", ["-I", "lbzip2", "-xpf", "%(source)s", "-C", "%(destination)s"], "LBZIP2", ["bz2", "tar.bz2", "tbz2"]],
+	"bzip2"     :["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "BZIP2", ["bz2", "tar.bz2", "tbz2"]],
 	"tar"       :["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "TAR", ["tar"]],
-	"xz"        :["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "XZ", ["xz"]],
-	"pixz"      :["_common", "tar", ["-I", "pixz", "-xpf", "%(source)s", "-C", "%(destination)s"], "PIXZ", ["xz"]],
-	"zip"       :["_common", "tar", ["-xpzf", "%(source)s", "-C", "%(destination)s"], "GZIP", ["zip"]],
-	"gz"        :["_common", "tar", ["-xpzf", "%(source)s", "-C", "%(destination)s"], "GZIP", ["zip"]],
+	"xz"        :["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "XZ", ["xz", "tar.xz"]],
+	"pixz"      :["_common", "tar", ["-I", "pixz", "-xpf", "%(source)s", "-C", "%(destination)s"], "PIXZ", ["xz", "tar.xz"]],
+	"gzip"      :["_common", "tar", ["-xpzf", "%(source)s", "-C", "%(destination)s"], "GZIP", ["gz", "tar.gz"]],
+	"squashfs"  :["_common", "unsquashfs", ["-d", "%(destination)s", "%(source)s"], "SQUASHFS", [".squashfs", ".sfs"]],
 	}
 
 
@@ -285,7 +286,7 @@ class CompressMap(object):
 
 
 	def create_infodict(self, source, destination=None, basedir=None,
-			filename='', mode=None, auto_extension=False):
+			filename='', mode=None, auto_extension=False, arch=None):
 		'''Puts the source and destination paths into a dictionary
 		for use in string substitution in the defintions
 		%(source) and %(destination) fields embedded into the commands
@@ -305,6 +306,7 @@ class CompressMap(object):
 			'destination': destination,
 			'basedir': basedir,
 			'filename': filename,
+			'arch': arch,
 			'mode': mode or self.mode,
 			'auto-ext': auto_extension,
 			}
