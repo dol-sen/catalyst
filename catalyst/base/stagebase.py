@@ -13,7 +13,8 @@ from catalyst.support import (CatalystError, msg, file_locate, normpath,
 from catalyst.base.targetbase import TargetBase
 from catalyst.base.clearbase import ClearBase
 from catalyst.base.genbase import GenBase
-from catalyst.defaults import TARGET_MOUNT_DEFAULTS, SOURCE_MOUNT_DEFAULTS
+from catalyst.defaults import (TARGET_MOUNT_DEFAULTS, SOURCE_MOUNT_DEFAULTS,
+	PORT_LOGDIR_CLEAN)
 from catalyst.lock import LockDir
 from catalyst.fileops import ensure_dirs, pjoin
 from catalyst.base.resume import AutoResume
@@ -253,9 +254,9 @@ class StageBase(TargetBase, ClearBase, GenBase):
 
 		if "port_logdir" in self.settings:
 			self.mounts.append("port_logdir")
-			self.mountmap["port_logdir"]=self.settings["port_logdir"]
-			self.env["PORT_LOGDIR"]=self.settings["port_logdir"]
-			self.env["PORT_LOGDIR_CLEAN"]='find "${PORT_LOGDIR}" -type f ! -name "summary.log*" -mtime +30 -delete'
+			self.mountmap["port_logdir"] = self.settings["port_logdir"]
+			self.env["PORT_LOGDIR"] = self.settings["port_logdir"]
+			self.env["PORT_LOGDIR_CLEAN"] = PORT_LOGDIR_CLEAN
 
 	def override_cbuild(self):
 		if "CBUILD" in self.makeconf:

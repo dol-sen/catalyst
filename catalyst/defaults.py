@@ -105,6 +105,9 @@ SOURCE_MOUNT_DEFAULTS = {
 	"shm": "shmfs",
 	}
 
+PORT_LOGDIR_CLEAN = \
+	'find "${PORT_LOGDIR}" -type f ! -name "summary.log*" -mtime +30 -delete'
+
 # legend:  key: message
 option_messages = {
 	"autoresume": "Autoresuming support enabled.",
