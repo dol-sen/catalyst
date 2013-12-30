@@ -209,6 +209,7 @@ class StageBase(TargetBase, ClearBase, GenBase):
 			#self.mountmap["portdir"] = None
 		if os.uname()[0] == "Linux":
 			self.mounts.append("devpts")
+			self.mounts.append("shm")
 
 		self.set_mounts()
 
@@ -930,7 +931,7 @@ class StageBase(TargetBase, ClearBase, GenBase):
 			ensure_dirs(target, mode=0755)
 
 			if not os.path.exists(self.mountmap[x]):
-				if not self.mountmap[x] == "tmpfs":
+				if self.mountmap[x] not in ["tmpfs", "shmfs"]:
 					ensure_dirs(self.mountmap[x], mode=0755)
 
 			src=self.mountmap[x]
@@ -951,6 +952,9 @@ class StageBase(TargetBase, ClearBase, GenBase):
 							self.settings["var_tmpfs_portage"] + "G " + \
 							src + " " + target
 						retval=os.system(cmd)
+				elif src == "shmfs":
+					cmd = "mount -t tmpfs -o noexec,nosuid,nodev shm " + target
+					retval=os.system(cmd)
 				else:
 					cmd = "mount --bind " + src + " " + target
 					#print "bind(); cmd =", cmd
