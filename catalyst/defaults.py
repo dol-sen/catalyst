@@ -94,6 +94,15 @@ TARGET_MOUNT_DEFAULTS = {
 	"proc": "/proc",
 	}
 
+SOURCE_MOUNT_DEFAULTS = {
+	"dev": "/dev",
+	"devpts": "/dev/pts",
+	"distdir": None,      # set from settings options
+	"portdir": None,      # set from settings options
+	"port_tmpdir": "tmpfs",
+	"proc": "/proc",
+	}
+
 # legend:  key: message
 option_messages = {
 	"autoresume": "Autoresuming support enabled.",

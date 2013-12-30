@@ -13,7 +13,7 @@ from catalyst.support import (CatalystError, msg, file_locate, normpath,
 from catalyst.base.targetbase import TargetBase
 from catalyst.base.clearbase import ClearBase
 from catalyst.base.genbase import GenBase
-from catalyst.defaults import TARGET_MOUNT_DEFAULTS
+from catalyst.defaults import TARGET_MOUNT_DEFAULTS, SOURCE_MOUNT_DEFAULTS
 from catalyst.lock import LockDir
 from catalyst.fileops import ensure_dirs, pjoin
 from catalyst.base.resume import AutoResume
@@ -194,15 +194,19 @@ class StageBase(TargetBase, ClearBase, GenBase):
 		""" Setup our mount points """
 		# initialize our target mounts.
 		self.target_mounts = TARGET_MOUNT_DEFAULTS.copy()
-		if "snapcache" in self.settings["options"]:
-			self.mounts=["proc", "dev", 'portdir', 'distdir', 'port_tmpdir']
-			self.mountmap={"proc":"/proc", "dev":"/dev", "pts":"/dev/pts",
-				"portdir":normpath(self.settings["snapshot_cache_path"]+"/" + self.settings["repo_name"]),
-				"distdir":self.settings["distdir"],"port_tmpdir":"tmpfs"}
-		else:
-			self.mounts=["proc","dev", "distdir", "port_tmpdir"]
-			self.mountmap={"proc":"/proc", "dev":"/dev", "pts":"/dev/pts",
-				"distdir":self.settings["distdir"], "port_tmpdir":"tmpfs"}
+
+		self.mounts = ["proc", "dev", "portdir", "distdir", "port_tmpdir"]
+		# initialize our source mounts
+		self.mountmap = SOURCE_MOUNT_DEFAULTS.copy()
+		# update them from settings
+		self.mountmap["distdir"] = self.settings["distdir"]
+		self.mountmap["portdir"] = normpath("/".join([
+			self.settings["snapshot_cache_path"],
+			self.settings["repo_name"],
+			]))
+		if "snapcache" not in self.settings["options"]:
+			self.mounts.remove("portdir")
+			#self.mountmap["portdir"] = None
 		if os.uname()[0] == "Linux":
 			self.mounts.append("devpts")
 
