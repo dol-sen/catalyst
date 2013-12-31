@@ -501,7 +501,13 @@ class StageBase(TargetBase, ClearBase, GenBase):
 #			"fetch" not in self.settings["options"]:
 		if "fetch" not in self.settings["options"]:
 			self.settings["action_sequence"].append("capture")
-		self.settings["action_sequence"].append("clear_autoresume")
+		if "keepwork" in self.settings["options"]:
+			self.settings["action_sequence"].append("clear_autoresume")
+		elif "seedcache" in self.settings["options"]:
+			self.settings["action_sequence"].append("remove_autoresume")
+		else:
+			self.settings["action_sequence"].append("remove_autoresume")
+			self.settings["action_sequence"].append("remove_chroot")
 
 	def set_use(self):
 		if self.settings["spec_prefix"]+"/use" in self.settings:
