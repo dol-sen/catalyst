@@ -9,7 +9,7 @@ from stat import ST_UID, ST_GID, ST_MODE
 
 
 from catalyst.support import (CatalystError, msg, file_locate, normpath,
-	touch, cmd, warn, list_bashify, read_makeconf, read_from_clst, ismount)
+	cmd, warn, list_bashify, read_makeconf, read_from_clst, ismount)
 from catalyst.base.targetbase import TargetBase
 from catalyst.base.clearbase import ClearBase
 from catalyst.base.genbase import GenBase
