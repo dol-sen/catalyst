@@ -762,9 +762,9 @@ class StageBase(TargetBase, ClearBase, GenBase):
 				if "autoresume" in self.settings["options"]:
 					print "No Valid Resume point detected, cleaning up..."
 
-				print "unpack()  clear_autoresume"
+				#print "unpack()  clear_autoresume"
 				self.clear_autoresume()
-				print "unpack()  clear_chroot()"
+				#print "unpack()  clear_chroot()"
 				self.clear_chroot()
 
 			ensure_dirs(self.settings["chroot_path"])
