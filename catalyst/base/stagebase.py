@@ -1341,7 +1341,6 @@ class StageBase(TargetBase, ClearBase, GenBase):
 				self.mount_safety_check()
 				raise e
 
-		self.chroot_lock.unlock()
 
 	def unmerge(self):
 		if "autoresume" in self.settings["options"] \
