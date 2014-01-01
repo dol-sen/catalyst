@@ -45,6 +45,26 @@ snapshot:
 # default/stage3-x86-2006.1
 source_subpath:
 
+# The prefered compression/decompression command and algorithm to use
+# for creating the final stage tarballs.  For decompression the configured
+# method will be used if the file's extension is one of it's types listed.
+# Otherwise it will pick one that does.  Of course you must ensure to have
+# the correct package installed that supplies that command/algorithm type.
+# available options are:
+#	Name          Extension
+#	"rsync"     : None
+#	"lbzip2"    : tar.bz2
+#	"tbz2"      : tbz2
+#	"bzip2"     : tar.bz2
+#	"tar"       : tar
+#	"xz"        : tar.xz
+#	"pixz"      : tar.xz
+#	"gzip"      : tar.gz
+#	"squashfs"  : squashfs, sfs
+compression_mode: lbzip2
+
+decompression_mode: lbzip2
+
 # These are the hosts used as distcc slaves when distcc is enabled in your
 # catalyst.conf.  It follows the same syntax as distcc-config --set-hosts and
 # is entirely optional.
