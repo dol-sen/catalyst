@@ -19,10 +19,10 @@ from collections import namedtuple
 from support import cmd
 
 
-definition_fields = ["func", "cmd", "args", "id", "extension"]
-defintition_types = [ str,    str,   list,   str,  list]
+DEFINITION_FIELDS = ["func", "cmd", "args", "id", "extension"]
+DEFINTITION_TYPES = [ str,    str,   list,   str,  list]
 
-definition_help = \
+DEFINITION_HELP = \
 '''The definition entries are to follow the the definition_types
 with the exception of the first entry "Type" which is a mode identifier
 for use in the class as a type ID and printable output string.
@@ -31,7 +31,7 @@ Definiton entries are composed of the following:
     access key: list of definition fields values.
     eg:
     "tar"       :["_common", "tar", ["-cpf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "TAR", ["tar"]],
-    access key  : list of definition_fields
+    access key  : list of DEFINITION_FIELDS
                  ["func", <== the class function to use to run the external utility with
                              "cmd", <==  the external utility command
                                      "args", <==  a list of the arguments to pass to the utility
@@ -48,7 +48,7 @@ values during run time:
 '''
 
 
-compress_definitions = {
+COMPRESS_DEFINITIONS = {
 	"Type"      :["Compression", "Compression definitions loaded"],
 	"rsync"     :["rsync", "rsync", ["-a", "--delete", "%(source)s",  "%(destination)s"], "RSYNC", None],
 	"lbzip2"    :["_common", "tar", ["-I", "lbzip2", "-cf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "LBZIP2", ["tar.bz2"]],
@@ -62,7 +62,7 @@ compress_definitions = {
 	}
 
 
-decompress_definitions = {
+DECOMPRESS_DEFINITIONS = {
 	"Type"      :["Decompression", "Decompression definitions loaded"],
 	"rsync"     :["rsync", "rsync", ["-a", "--delete", "%(source)s", "%(destination)s"], "RSYNC", None],
 	"lbzip2"    :["_common", "tar", ["-I", "lbzip2", "-xpf", "%(source)s", "-C", "%(destination)s"], "LBZIP2", ["bz2", "tar.bz2", "tbz2"]],
@@ -71,13 +71,13 @@ decompress_definitions = {
 	"xz"        :["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "XZ", ["xz", "tar.xz"]],
 	"pixz"      :["_common", "tar", ["-I", "pixz", "-xpf", "%(source)s", "-C", "%(destination)s"], "PIXZ", ["xz", "tar.xz"]],
 	"gzip"      :["_common", "tar", ["-xpzf", "%(source)s", "-C", "%(destination)s"], "GZIP", ["gz", "tar.gz"]],
-	"squashfs"  :["_common", "unsquashfs", ["-d", "%(destination)s", "%(source)s"], "SQUASHFS", [".squashfs", ".sfs"]],
+	"squashfs"  :["_common", "unsquashfs", ["-d", "%(destination)s", "%(source)s"], "SQUASHFS", ["squashfs", "sfs"]],
 	}
 
 
 '''Configure this here in case it is ever changed.
 This is the only edit point required then.'''
-extension_separator = '.'
+EXTENSION_SEPARATOR = '.'
 
 
 def create_classes(definitions, fields):
@@ -85,7 +85,7 @@ def create_classes(definitions, fields):
 	used for the information they contain in a consistent manner.
 
 	@parm definitions: dict, of (de)compressor definitions
-		see definition_fields and defintition_types defined in this
+		see DEFINITION_FIELDS and DEFINTITION_TYPES defined in this
 		library.
 	@param fields: list of the field names to create
 	@return class_map: dictionary of key: namedtuple class instance
@@ -107,11 +107,11 @@ class CompressMap(object):
 	Catalyst's compression & decompression of archives'''
 
 	'''fields: list of ordered field names for the (de)compression functions'''
-	fields = definition_fields[:]
+	fields = DEFINITION_FIELDS[:]
 
 
 	def __init__(self, definitions=None, env=None,
-			default_mode=None, separator=extension_separator):
+			default_mode=None, separator=EXTENSION_SEPARATOR):
 		'''Class init
 
 		@param compress_mode: boolean, defaults to True
