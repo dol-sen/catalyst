@@ -58,7 +58,7 @@ COMPRESS_DEFINITIONS = {
 	"xz"        :["_common", "tar", ["-cpJf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "XZ", ["tar.xz"]],
 	"pixz"      :["_common", "tar", ["-I", "pixz", "-cpf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "PIXZ", ["tar.xz"]],
 	"gzip"      :["_common", "tar", ["-cpzf", "%(filename)s", "-C", "%(basedir)s", "%(source)s"], "GZIP", ["tar.gz"]],
-	"squashfs"  :["_common", "mksquashfs", ["%(source)s", "%(destination)s", "-comp", "xz", "-Xbcj", "%(arch)s", "-b", "1M"], "SQUASHFS", [".squashfs", ".sfs"]],
+	"squashfs"  :["_common", "mksquashfs", ["%(source)s", "%(destination)s", "-comp", "xz", "-Xbcj", "%(arch)s", "-b", "1M"], "SQUASHFS", ["squashfs", "sfs"]],
 	}
 
 
