@@ -10,7 +10,8 @@ required_config_file_values = ["storedir", "sharedir", "distdir", "portdir"]
 valid_config_file_values = required_config_file_values[:]
 valid_config_file_values.extend([ "distcc", "envscript",
 	"options", "DEBUG", "VERBOSE",
-	"snapshot_cache", "hash_function", "digests", "contents"
+	"snapshot_cache", "hash_function", "digests", "contents",
+	"compression_mode", "decompression_mode",
 	])
 
 verbosity = 1
