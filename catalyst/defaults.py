@@ -68,8 +68,8 @@ contents_definitions = {
 # due to them not being compatible in the bash environment
 confdefaults={
 	"archdir": "%(PythonDir)s/arch",
-	"compression_mode": 'lbz2',
-	"decompression_mode": 'lbz2',
+	"compression_mode": 'lbzip2',
+	"decompression_mode": 'lbzip2',
 	"distdir": "/usr/portage/distfiles",
 	"hash_function": "crc32",
 	"local_overlay": "/usr/local/portage",
