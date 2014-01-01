@@ -35,14 +35,14 @@ profile:
 
 # This specifies which snapshot to use for building this target.
 # example:
-# snapshot: 2006.1
+# snapshot: 2006.1.tar.bz2
 snapshot:
 
 # This specifies where the seed stage comes from for this target,  The path is
 # relative to $clst_sharedir/builds.  The rel_type is also used as a path prefix
-# for the seed.
+# for the seed.  It must be a complete filename including the extension.
 # example:
-# default/stage3-x86-2006.1
+# default/stage3-x86-2006.1.tar.bz2
 source_subpath:
 
 # The prefered compression/decompression command and algorithm to use
@@ -61,9 +61,9 @@ source_subpath:
 #	"pixz"      : tar.xz
 #	"gzip"      : tar.gz
 #	"squashfs"  : squashfs, sfs
-compression_mode: lbzip2
+compression_mode: bzip2
 
-decompression_mode: lbzip2
+decompression_mode: bzip2
 
 # These are the hosts used as distcc slaves when distcc is enabled in your
 # catalyst.conf.  It follows the same syntax as distcc-config --set-hosts and
