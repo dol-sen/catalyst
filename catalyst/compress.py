@@ -20,7 +20,7 @@ from support import cmd
 
 
 DEFINITION_FIELDS = ["func", "cmd", "args", "id", "extension"]
-DEFINTITION_TYPES = [ str,    str,   list,   str,  list]
+DEFINITION_TYPES =  [ str,    str,   list,   str,  list]
 
 DEFINITION_HELP = \
 '''The definition entries are to follow the the definition_types
