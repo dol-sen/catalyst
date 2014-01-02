@@ -19,7 +19,7 @@ from collections import namedtuple
 from support import cmd
 
 
-DEFINITION_FIELDS = ["func", "cmd", "args", "id", "extension"]
+DEFINITION_FIELDS = ["func", "cmd", "args", "id", "extensions"]
 DEFINITION_TYPES =  [ str,    str,   list,   str,  list]
 
 DEFINITION_HELP = \
@@ -36,7 +36,7 @@ Definiton entries are composed of the following:
                              "cmd", <==  the external utility command
                                      "args", <==  a list of the arguments to pass to the utility
                                                                                                   "id", <== ID string that identifies the utility
-                                                                                                        "extension"], <== the list of file extensions this command handles
+                                                                                                        "extensions"], <== the list of file extensions this command handles
 
 Available named string variables that will be substituted with the passed in
 values during run time:
@@ -117,7 +117,7 @@ class CompressMap(object):
 		@param compress_mode: boolean, defaults to True
 			describes compression or de-compression definitions loaded
 		@param definitions: dictionary of
-			Key:[function, cmd, cmd_args, Print/id string, extension]
+			Key:[function, cmd, cmd_args, Print/id string, extensions]
 		@param env: environment to pass to the cmd subprocess
 		'''
 		if definitions is None:
@@ -351,7 +351,7 @@ class CompressMap(object):
 		'''
 		if self.is_supported(mode):
 			if all_extensions:
-				return self._map[mode].extension
+				return self._map[mode].extensions
 			else: #return the first one (default)
-				return self._map[mode].extension[0]
+				return self._map[mode].extensions[0]
 		return ''
