@@ -80,6 +80,7 @@ confdefaults={
 	"portdir": "/usr/portage",
 	"port_tmpdir": "/var/tmp/portage",
 	"PythonDir": "./catalyst",
+	"repo_basedir": "/usr",
 	"repo_name": "portage",
 	"sharedir": "/usr/lib/catalyst",
 	"shdir": "/usr/lib/catalyst/targets/",

@@ -797,6 +797,10 @@ class StageBase(TargetBase, ClearBase, GenBase):
 			'auto-ext': False,
 			}
 
+		target_portdir = normpath(self.settings["chroot_path"] +
+			self.settings["repo_basedir"] + "/" + self.settings["repo_name"])
+		print self.settings["chroot_path"]
+		print "unpack(), target_portdir = " + target_portdir
 		if "snapcache" in self.settings["options"]:
 			snapshot_cache_hash=\
 				read_from_clst(self.settings["snapshot_cache_path"]+\
@@ -818,13 +822,12 @@ class StageBase(TargetBase, ClearBase, GenBase):
 			cleanup_msg=\
 				"Cleaning up existing portage tree (This can take a long time)..."
 			unpack_info['destination'] = normpath(
-				self.settings["chroot_path"] + self.settings["portdir"])
+				self.settings["chroot_path"] + self.settings["repo_basedir"])
 			unpack_info['mode'] = self.decompressor.determine_mode(
 				unpack_info['source'])
 
 			if "autoresume" in self.settings["options"] \
-				and os.path.exists(self.settings["chroot_path"] +
-					self.settings["portdir"]) \
+				and os.path.exists(target_portdir) \
 				and self.resume.is_enabled("unpack_portage") \
 				and self.settings["snapshot_path_hash"] == snapshot_hash:
 					print \
@@ -834,11 +837,12 @@ class StageBase(TargetBase, ClearBase, GenBase):
 		if unpack:
 			if "snapcache" in self.settings["options"]:
 				self.snapshot_lock_object.write_lock()
-			if os.path.exists(unpack_info['destination']):
+			if os.path.exists(target_portdir):
 				print cleanup_msg
-				cleanup_cmd="rm -rf "+unpack_info['destination']
+				cleanup_cmd = "rm -rf " + target_portdir
+				print "unpack() cleanup_cmd = " + cleanup_cmd
 				cmd(cleanup_cmd,cleanup_errmsg,env=self.env)
-			ensure_dirs(unpack_info['destination'],mode=0755)
+			ensure_dirs(target_portdir, mode=0755)
 
 			print "Unpacking portage tree (This can take a long time) ..."
 			if not self.decompressor.extract(unpack_info):
