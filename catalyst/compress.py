@@ -64,12 +64,12 @@ COMPRESS_DEFINITIONS = {
 DECOMPRESS_DEFINITIONS = {
 	"Type"      :["Decompression", "Decompression definitions loaded"],
 	"rsync"     :["rsync", "rsync", ["-a", "--delete", "%(source)s", "%(destination)s"], "RSYNC", None],
-	"lbzip2"    :["_common", "tar", ["-I", "lbzip2", "-xpf", "%(source)s", "-C", "%(destination)s"], "LBZIP2", ["bz2", "tar.bz2", "tbz2"]],
-	"bzip2"     :["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "BZIP2", ["bz2", "tar.bz2", "tbz2"]],
+	"lbzip2"    :["_common", "tar", ["-I", "lbzip2", "-xpf", "%(source)s", "-C", "%(destination)s"], "LBZIP2", ["tar.bz2", "bz2", "tbz2"]],
+	"bzip2"     :["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "BZIP2", ["tar.bz2", "bz2", "tbz2"]],
 	"tar"       :["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "TAR", ["tar"]],
-	"xz"        :["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "XZ", ["xz", "tar.xz"]],
-	"pixz"      :["_common", "tar", ["-I", "pixz", "-xpf", "%(source)s", "-C", "%(destination)s"], "PIXZ", ["xz", "tar.xz"]],
-	"gzip"      :["_common", "tar", ["-xpzf", "%(source)s", "-C", "%(destination)s"], "GZIP", ["gz", "tar.gz"]],
+	"xz"        :["_common", "tar", ["-xpf", "%(source)s", "-C", "%(destination)s"], "XZ", ["tar.xz", "xz"]],
+	"pixz"      :["_common", "tar", ["-I", "pixz", "-xpf", "%(source)s", "-C", "%(destination)s"], "PIXZ", ["tar.xz", "xz"]],
+	"gzip"      :["_common", "tar", ["-xpzf", "%(source)s", "-C", "%(destination)s"], "GZIP", ["tar.gz", "gz"]],
 	"squashfs"  :["_common", "unsquashfs", ["-d", "%(destination)s", "%(source)s"], "SQUASHFS", ["squashfs", "sfs"]],
 	}
 
