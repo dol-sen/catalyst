@@ -11,7 +11,7 @@ valid_config_file_values = required_config_file_values[:]
 valid_config_file_values.extend([ "distcc", "envscript",
 	"options", "DEBUG", "VERBOSE",
 	"snapshot_cache", "hash_function", "digests", "contents",
-	"compression_mode", "decompression_mode",
+	"compression_mode", "decompressor_search_order",
 	])
 
 verbosity = 1
@@ -69,7 +69,7 @@ contents_definitions = {
 confdefaults={
 	"archdir": "%(PythonDir)s/arch",
 	"compression_mode": 'lbzip2',
-	"decompression_mode": 'lbzip2',
+	"decompressor_search_order": 'lbzip2 bzip2 tar pixz xz gzip squashfs',
 	"distdir": "/usr/portage/distfiles",
 	"hash_function": "crc32",
 	"local_overlay": "/usr/local/portage",

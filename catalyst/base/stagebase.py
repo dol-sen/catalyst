@@ -253,7 +253,8 @@ class StageBase(TargetBase, ClearBase, GenBase):
 
 		# Initialize our (de)compressor's)
 		self.decompressor = CompressMap(self.settings["decompress_definitions"],
-			env=self.env, default_mode=self.settings['decompression_mode'])
+			env=self.env,
+			search_order=self.settings["decompressor_search_order"])
 
 		# save resources, it is not always needed
 		self.compressor = None
@@ -692,13 +693,11 @@ class StageBase(TargetBase, ClearBase, GenBase):
 			else:
 				""" SEEDCACHE is a not a directory, try untar'ing """
 				print "Referenced SEEDCACHE does not appear to be a directory, trying to untar..."
-				unpack_info['mode'] = self.decompressor.best_mode(
-						self.settings['decompression_mode'],
+				unpack_info['mode'] = self.decompressor.determine_mode(
 						self.settings["source_path"])
 		else:
 			""" No SEEDCACHE, use tar """
-			unpack_info['mode'] = self.decompressor.best_mode(
-					self.settings['decompression_mode'],
+			unpack_info['mode'] = self.decompressor.determine_mode(
 					unpack_info["source"])
 		# endif "seedcache"
 
@@ -802,8 +801,7 @@ class StageBase(TargetBase, ClearBase, GenBase):
 			snapshot_cache_hash=\
 				read_from_clst(self.settings["snapshot_cache_path"]+\
 				"catalyst-hash")
-			unpack_info['mode'] = self.decompressor.best_mode(
-				self.settings['decompression_mode'],
+			unpack_info['mode'] = self.decompressor.determine_mode(
 				unpack_info['source'])
 
 			cleanup_msg="Cleaning up invalid snapshot cache at \n\t"+\
@@ -821,8 +819,7 @@ class StageBase(TargetBase, ClearBase, GenBase):
 				"Cleaning up existing portage tree (This can take a long time)..."
 			unpack_info['destination'] = normpath(
 				self.settings["chroot_path"] + self.settings["portdir"])
-			unpack_info['mode'] = self.decompressor.best_mode(
-				self.settings['decompression_mode'],
+			unpack_info['mode'] = self.decompressor.determine_mode(
 				unpack_info['source'])
 
 			if "autoresume" in self.settings["options"] \

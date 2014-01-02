@@ -109,8 +109,8 @@ class CompressMap(object):
 	fields = DEFINITION_FIELDS[:]
 
 
-	def __init__(self, definitions=None, env=None,
-			default_mode=None, separator=EXTENSION_SEPARATOR):
+	def __init__(self, definitions=None, env=None, default_mode=None,
+			separator=EXTENSION_SEPARATOR, search_order=None):
 		'''Class init
 
 		@param compress_mode: boolean, defaults to True
@@ -138,6 +138,8 @@ class CompressMap(object):
 			self.mode = default_mode or 'auto'
 			self.compress = None
 			self.extract = self._extract
+		self.search_order = search_order
+		print("COMPRESS: __init__(), search_order = " + str(self.search_order))
 		# create the (de)compression definition namedtuple classes
 		self._map = create_classes(definitions, self.fields)
 
@@ -229,6 +231,30 @@ class CompressMap(object):
 		@return string: file type extension of the source file
 		'''
 		return os.path.splitext(source)[1]
+
+
+	def determine_mode(self, source):
+		'''Uses the decompressor_search_order spec parameter and
+		compares the decompressor's file extension strings
+		with the source file and returns the mode to use for decompression.
+
+		@param source: string, file path of the file to determine
+		@return string: the decompressor mode to use on the source file
+		'''
+		print("COMPRESS: determine_mode(), source = " + source)
+		result = None
+		for mode in self.search_order:
+			print("COMPRESS: determine_mode(), mode = " + mode)
+			for ext in self._map[mode].extensions:
+				if source.endswith(ext):
+					result = mode
+					break
+			if result:
+				break
+		if not result:
+			print("COMPRESS: determine_mode(), failed to find a mode " +
+				"to use for: " + source)
+		return result
 
 
 	def rsync(self, infodict=None, source=None, destination=None,
@@ -325,20 +351,6 @@ class CompressMap(object):
 	def available_modes(self):
 		'''Convienence function to return the available modes'''
 		return list(self._map)
-
-
-	def best_mode(self, prefered_mode, source):
-		'''Compare the prefered_mode's extension with the source extension
-		and returns the best choice
-
-		@param prefered_mode: string
-		@param source: string, path the the source file
-		@return string: best mode to use for the extraction
-		'''
-		ext = self.get_extension(source)
-		if ext in self._map[prefered_mode].extension:
-			return prefered_mode
-		return ext
 
 
 	def extension(self, mode, all_extensions=False):

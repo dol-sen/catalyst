@@ -108,6 +108,8 @@ def parse_config(myconfig):
 			print "Setting",x,"to config file value \""+myconf[x]+"\""
 			if x == 'options':
 				conf_values[x] = set(myconf[x].split())
+			elif x in ["decompressor_search_order"]:
+				conf_values[x] = myconf[x].split()
 			else:
 				conf_values[x]=myconf[x]
 		else:
