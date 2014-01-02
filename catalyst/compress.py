@@ -139,7 +139,7 @@ class CompressMap(object):
 			self.compress = None
 			self.extract = self._extract
 		# create the (de)compression definition namedtuple classes
-		self._map = self.create_classes(definitions, self.fields)
+		self._map = create_classes(definitions, self.fields)
 
 
 	def _compress(self, infodict=None, filename='', source=None,
