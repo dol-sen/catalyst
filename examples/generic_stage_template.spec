@@ -51,19 +51,25 @@ source_subpath:
 # Otherwise it will pick one that does.  Of course you must ensure to have
 # the correct package installed that supplies that command/algorithm type.
 # available options are:
-#	Name          Extension
+#	Name          Compressor Extension
 #	"rsync"     : None
 #	"lbzip2"    : tar.bz2
-#	"tbz2"      : tbz2
 #	"bzip2"     : tar.bz2
 #	"tar"       : tar
 #	"xz"        : tar.xz
 #	"pixz"      : tar.xz
 #	"gzip"      : tar.gz
 #	"squashfs"  : squashfs, sfs
-compression_mode: bzip2
+#
+compression_mode: lbzip2
 
-decompression_mode: bzip2
+# The search order to use for determining the decompressor
+# to use on the source file.  i.e. check the extensions it is capable of
+# decompressing to find a match.  Use the list above for the modes available.
+#Note: rsync is a special case, do not include it below.
+#
+decompressor_search_order: lbzip2 bzip2 tar pixz xz gzip squashfs
+
 
 # These are the hosts used as distcc slaves when distcc is enabled in your
 # catalyst.conf.  It follows the same syntax as distcc-config --set-hosts and
