@@ -1349,12 +1349,12 @@ class StageBase(TargetBase, ClearBase, GenBase):
 		for x in self.settings["action_sequence"]:
 			print "--- Running action sequence: "+x
 			sys.stdout.flush()
-			try:
-				apply(getattr(self,x))
-			except Exception as e:
-				print "--- Exeption running action sequence:" + x
-				self.mount_safety_check()
-				raise e
+			#try:
+			apply(getattr(self,x))
+			#except Exception as e:
+			#	print "--- Exeption running action sequence:" + x
+			#	self.mount_safety_check()
+			#	raise e
 
 		self.chroot_lock.unlock()
 
