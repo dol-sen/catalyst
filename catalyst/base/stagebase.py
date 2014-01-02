@@ -458,10 +458,10 @@ class StageBase(TargetBase, ClearBase, GenBase):
 						verbose=False)
 
 	def set_snapcache_path(self):
+		self.settings["snapshot_cache_path"]=\
+			normpath(pjoin(self.settings["snapshot_cache"],
+				self.settings["snapshot"]))
 		if "snapcache" in self.settings["options"]:
-			self.settings["snapshot_cache_path"]=\
-				normpath(pjoin(self.settings["snapshot_cache"],
-					self.settings["snapshot"]))
 			self.snapcache_lock=\
 				LockDir(self.settings["snapshot_cache_path"])
 			print "Caching snapshot to "+self.settings["snapshot_cache_path"]
