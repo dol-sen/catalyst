@@ -6,3 +6,5 @@ dist*
 *.patch
 MANIFEST
 *.geany
+build
+files
