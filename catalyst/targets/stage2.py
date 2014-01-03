@@ -20,8 +20,8 @@ class stage2(StageBase):
 		StageBase.__init__(self,spec,addlargs)
 
 	def set_source_path(self):
-		if "seedcache" in self.settings["options"] and os.path.isdir(normpath(self.settings["storedir"]+"/tmp/"+self.settings["source_subpath"]+"/tmp/stage1root/")):
-			self.settings["source_path"]=normpath(self.settings["storedir"]+"/tmp/"+self.settings["source_subpath"]+"/tmp/stage1root/")
+		if "seedcache" in self.settings["options"] and os.path.isdir(normpath(self.settings["storedir"]+"/tmp/"+self.settings["source_subpath"]+"/tmp/stage1root")):
+			self.settings["source_path"]=normpath(self.settings["storedir"]+"/tmp/"+self.settings["source_subpath"]+"/tmp/stage1root")
 		else:
 			self.settings["source_path"]=normpath(self.settings["storedir"]+"/builds/"+self.settings["source_subpath"].rstrip('/')+".tar.bz2")
 			if os.path.isfile(self.settings["source_path"]):

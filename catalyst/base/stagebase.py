@@ -294,7 +294,7 @@ class StageBase(TargetBase, ClearBase, GenBase):
 	def set_target_subpath(self):
 		self.settings["target_subpath"]=self.settings["rel_type"]+"/"+\
 				self.settings["target"]+"-"+self.settings["subarch"]+"-"+\
-				self.settings["version_stamp"] +'/'
+				self.settings["version_stamp"]
 
 	def set_source_subpath(self):
 		if type(self.settings["source_subpath"])!=types.StringType:
@@ -310,7 +310,7 @@ class StageBase(TargetBase, ClearBase, GenBase):
 		else:
 			self.settings["pkgcache_path"]=\
 				normpath(self.settings["storedir"]+"/packages/"+\
-				self.settings["target_subpath"]+"/")
+				self.settings["target_subpath"])
 
 	def set_kerncache_path(self):
 		if "kerncache_path" in self.settings:
@@ -319,7 +319,7 @@ class StageBase(TargetBase, ClearBase, GenBase):
 					normpath(self.settings["kerncache_path"])
 		else:
 			self.settings["kerncache_path"]=normpath(self.settings["storedir"]+\
-				"/kerncache/"+self.settings["target_subpath"]+"/")
+				"/kerncache/"+self.settings["target_subpath"])
 
 	def set_target_path(self):
 		self.settings["target_path"]=normpath(self.settings["storedir"]+\
@@ -402,7 +402,7 @@ class StageBase(TargetBase, ClearBase, GenBase):
 	def set_source_path(self):
 		if "seedcache" in self.settings["options"]\
 			and os.path.isdir(normpath(self.settings["storedir"]+"/tmp/"+\
-				self.settings["source_subpath"]+"/")):
+				self.settings["source_subpath"])):
 			self.settings["source_path"]=normpath(self.settings["storedir"]+\
 				"/tmp/"+self.settings["source_subpath"])
 		else:
