@@ -1,1 +1,7 @@
 *.py[co]
+test*
+outgoing*
+Scratch*
+dist*
+*.patch
+MANIFEST
