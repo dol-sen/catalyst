@@ -349,10 +349,10 @@ def main():
 	try:
 		build_target(addlargs)
 
-	except CatalystError:
-		print
-		print "Catalyst aborting...."
-		sys.exit(2)
+	#except CatalystError:
+	#	print
+	#	print "Catalyst aborting...."
+	#	sys.exit(2)
 	except KeyboardInterrupt:
 		print "\nCatalyst build aborted due to user interrupt ( Ctrl-C )"
 		print
@@ -361,24 +361,8 @@ def main():
 	except LockInUse:
 		print "Catalyst aborting...."
 		sys.exit(2)
-	except:
-		print "Catalyst aborting...."
-		raise
-		sys.exit(2)
-
-	#except CatalystError:
-	#	print
+	#except:
 	#	print "Catalyst aborting...."
-	#	sys.exit(2)
-	#except KeyError:
-	#	print "\nproblem with command line or spec file ( Key Error )"
-	#	print "Key: "+str(sys.exc_value)+" was not found"
-	#	print "Catalyst aborting...."
-	#	sys.exit(2)
-	#except UnboundLocalError:
-	#	print
-	#	print "UnboundLocalError: "+str(sys.exc_value)+" was not found"
 	#	raise
-	#	print
-	#	print "Catalyst aborting...."
 	#	sys.exit(2)
+
