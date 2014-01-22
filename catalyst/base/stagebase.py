@@ -13,10 +13,11 @@ from catalyst.support import (CatalystError, msg, file_locate, normpath,
 from catalyst.base.targetbase import TargetBase
 from catalyst.base.clearbase import ClearBase
 from catalyst.base.genbase import GenBase
-from catalyst.defaults import target_mounts
+from catalyst.defaults import TARGET_MOUNT_DEFAULTS
 from catalyst.lock import LockDir
 from catalyst.fileops import ensure_dirs, pjoin
 from catalyst.base.resume import AutoResume
+
 
 class StageBase(TargetBase, ClearBase, GenBase):
 	"""
@@ -191,7 +192,8 @@ class StageBase(TargetBase, ClearBase, GenBase):
 			file_locate(self.settings,["portage_confdir"],expand=0)
 
 		""" Setup our mount points """
-		self.target_mounts = target_mounts.copy()
+		# initialize our target mounts.
+		self.target_mounts = TARGET_MOUNT_DEFAULTS.copy()
 		if "snapcache" in self.settings["options"]:
 			self.mounts=["proc", "dev", 'portdir', 'distdir', 'port_tmpdir']
 			self.mountmap={"proc":"/proc", "dev":"/dev", "pts":"/dev/pts",
@@ -202,7 +204,7 @@ class StageBase(TargetBase, ClearBase, GenBase):
 			self.mountmap={"proc":"/proc", "dev":"/dev", "pts":"/dev/pts",
 				"distdir":self.settings["distdir"], "port_tmpdir":"tmpfs"}
 		if os.uname()[0] == "Linux":
-			self.mounts.append("pts")
+			self.mounts.append("devpts")
 
 		self.set_mounts()
 

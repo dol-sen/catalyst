@@ -80,18 +80,18 @@ confdefaults={
 	}
 
 
-target_mounts = {
-	"proc": "/proc",
-	"dev": "/dev",
-	"pts": "/dev/pts",
-	"portdir": "/usr/portage",
-	"distdir": "/usr/portage/distfiles",
-	"packagedir": "/usr/portage/packages",
-	"port_tmpdir": "/var/tmp/portage",
-	"kerncache": "/tmp/kerncache",
+TARGET_MOUNT_DEFAULTS = {
 	"ccache": "/var/tmp/ccache",
-	"icecream": "/var/cache/icecream",
+	"dev": "/dev",
+	"devpts": "/dev/pts",
+	"distdir": "/usr/portage/distfiles",
+	"icecream": "/usr/lib/icecc/bin",
+	"kerncache": "/tmp/kerncache",
+	"packagedir": "/usr/portage/packages",
+	"portdir": "/usr/portage",
+	"port_tmpdir": "/var/tmp/portage",
 	"port_logdir": "/var/log/portage",
+	"proc": "/proc",
 	}
 
 # legend:  key: message
