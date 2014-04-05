@@ -1024,7 +1024,7 @@ class StageBase(TargetBase, ClearBase, GenBase):
 		else:
 			print "Setting up chroot..."
 
-			cmd("cp /etc/resolv.conf "+self.settings["chroot_path"]+"/etc",\
+			cmd("cp /etc/resolv.conf " + self.settings["chroot_path"] + "/etc/",
 				"Could not copy resolv.conf into place.",env=self.env)
 
 			""" Copy over the envscript, if applicable """
