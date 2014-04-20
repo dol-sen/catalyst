@@ -4,20 +4,20 @@ source ${clst_shdir}/support/functions.sh
 source ${clst_shdir}/support/filesystem-functions.sh
 
 
-extract_kernels ${clst_target_path}boot
+extract_kernels ${clst_target_path}/boot
 
-# Move kernel binaries to ${clst_target_path}kernels, and
-# move everything else to ${clst_target_path}kernels/misc
-mkdir ${clst_target_path}kernels
-mkdir ${clst_target_path}kernels/misc
+# Move kernel binaries to ${clst_target_path}/kernels, and
+# move everything else to ${clst_target_path}/kernels/misc
+mkdir ${clst_target_path}/kernels
+mkdir ${clst_target_path}/kernels/misc
 
 for x in ${clst_boot_kernel}; do
-	mv ${clst_target_path}boot/${x} ${clst_target_path}kernels
-	mv ${clst_target_path}boot/${x}.igz ${clst_target_path}kernels/misc
-	mv ${clst_target_path}boot/System-${x}.map ${clst_target_path}kernels/misc
+	mv ${clst_target_path}/boot/${x} ${clst_target_path}/kernels
+	mv ${clst_target_path}/boot/${x}.igz ${clst_target_path}/kernels/misc
+	mv ${clst_target_path}/boot/System-${x}.map ${clst_target_path}/kernels/misc
 done
 
-rmdir ${clst_target_path}boot
+rmdir ${clst_target_path}/boot
 
 # Any post-processing necessary for each architecture can be done here.  This
 # may include things like sparc's elftoaout, x86's PXE boot, etc.
@@ -50,8 +50,8 @@ case ${clst_hostarch} in
 			piggyback=piggyback64
 		fi
 		for x in ${clst_boot_kernel}; do
-			elftoaout ${clst_target_path}/kernels/${x} -o ${clst_target_path}${x}-a.out
-			${piggyback} ${clst_target_path}/${x}-a.out ${clst_target_path}kernels/misc/System.map-${x} ${clst_target_path}kernels/misc/${x}.igz
+			elftoaout ${clst_target_path}/kernels/${x} -o ${clst_target_path}/${x}-a.out
+			${piggyback} ${clst_target_path}/${x}-a.out ${clst_target_path}/kernels/misc/System.map-${x} ${clst_target_path}/kernels/misc/${x}.igz
 		done
 		;;
 	ia64)
